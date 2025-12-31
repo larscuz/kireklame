@@ -4,7 +4,7 @@ import { createRoot } from 'react-dom/client';
 import { GoogleGenAI, Type } from "@google/genai";
 
 // --- Typer ---
-type Segment = 'liten' | 'stor';
+type Segment = 'oslo' | 'norge';
 
 interface Company {
   id: string;
@@ -25,116 +25,50 @@ interface Company {
   kilde?: string;
 }
 
-// MANUELL REDIGERING: Endre disse objektene for å legge til ekte innhold
-const MOCK_COMPANIES: Company[] = [
-  // SMÅ BEDRIFTER
-  { 
-    id: '1', 
-    name: 'ARTI Consult', 
-    segment: 'liten', 
-    desc: 'Norsk konsulentbedrift som tilbyr generative AI-løsninger for reklame, workshops og implementering av AI i digital markedsføring.', 
-    city: 'Oslo', 
-    land: 'Norge',
-    videoUrl: '', 
-    contact: 'post@articonsult.no',
-    kategori: 'byrå',
-    tilbyr_AI: true,
-    AI_tjenester: ['AI-strategi', 'Generative AI løsninger'] 
-  },
-  { 
-    id: '3', 
-    name: 'Bølgen Reklamebyrå', 
-    segment: 'liten', 
-    desc: 'Fullservice reklamebyrå som tilbyr AI-assistert produksjon av visuelt innhold, foto og video for kampanjer.', 
-    city: 'Oslo', 
-    land: 'Norge',
-    videoUrl: '', 
-    contact: 'post@blgn.no',
-    kategori: 'byrå',
-    tilbyr_AI: true,
-    AI_tjenester: ['AI-video', 'AI-bilde'] 
-  },
-  { 
-    id: '4', 
-    name: 'Well Told', 
-    segment: 'liten', 
-    desc: 'Kreativt storytelling-byrå i Norge som bruker AI for å effektivisere konseptutvikling og innholdsproduksjon.', 
-    city: 'Oslo', 
-    land: 'Norge',
-    videoUrl: '', 
-    contact: 'post@welltold.no',
-    kategori: 'byrå',
-    tilbyr_AI: true,
-    AI_tjenester: ['AI-innholdsproduksjon', 'AI-kampanjer'] 
-  },
-  { 
-    id: '5', 
-    name: 'Good Morning', 
-    segment: 'liten', 
-    desc: 'Digitalt byrå i Oslo som bruker AI for innholdsproduksjon, tekst, video, voice og musikk i reklamekampanjer.', 
-    city: 'Oslo', 
-    land: 'Norge',
-    videoUrl: '', 
-    contact: 'post@goodmorning.no',
-    kategori: 'byrå',
-    tilbyr_AI: true,
-    AI_tjenester: ['AI-tekst', 'AI-video', 'AI-voice'] 
-  },
+// HJELPEFUNKSJON FOR Å GENERERE MOCK-DATA (Disse kan du redigere manuelt under)
+const generateMocks = () => {
+  const mocks: Company[] = [];
+  
+  // 50 Bedrifter i Oslo
+  for (let i = 1; i <= 50; i++) {
+    mocks.push({
+      id: `oslo-${i}`,
+      name: `Oslo Bedrift ${i}`,
+      segment: 'oslo',
+      desc: `Beskrivelse for Oslo-bedrift nummer ${i}. Rediger denne teksten manuelt i koden.`,
+      city: 'Oslo',
+      land: 'Norge',
+      videoUrl: i % 2 === 0 ? 'https://www.w3schools.com/html/mov_bbb.mp4' : 'https://www.w3schools.com/html/movie.mp4',
+      website: 'https://www.google.com',
+      contact: `oslo${i}@bedrift.no`,
+      tilbyr_AI: true,
+      AI_tjenester: ['KI-Video', 'KI-Strategi']
+    });
+  }
 
-  // STORE INTERNASJONALE AKTØRER/PRESSENTER
-  { 
-    id: '2', 
-    name: 'Synthesia', 
-    segment: 'stor', 
-    desc: 'UK-basert AI-video-plattform som lar bedrifter lage AI-genererte videoer med avatars og stemmer i mange språk.', 
-    city: 'London', 
-    land: 'Storbritannia',
-    videoUrl: 'https://www.synthesia.io/', 
-    contact: 'support@synthesia.io',
-    kategori: 'plattform',
-    tilbyr_AI: true,
-    AI_tjenester: ['AI-video', 'Avatarer', 'Multispråklige videoer']
-  },
-  { 
-    id: '6', 
-    name: 'Gisteo', 
-    segment: 'stor', 
-    desc: 'AI video-produksjonsselskap som kombinerer generative AI og kreativ redigering for kundevideoer og kampanjeinnhold.', 
-    city: 'Chicago', 
-    land: 'USA',
-    videoUrl: 'https://gisteo.com/ai-video-production-services/', 
-    contact: 'info@gisteo.com',
-    kategori: 'byrå',
-    tilbyr_AI: true,
-    AI_tjenester: ['AI-video', 'Avatar AI', 'Cinematic AI']
-  },
-  { 
-    id: '7', 
-    name: 'Synima', 
-    segment: 'stor', 
-    desc: 'Internasjonalt AI video-byrå som bruker generativ AI i videoopprettelse, redigering og produksjon for reklame og kampanjer.', 
-    city: 'Remote', 
-    land: 'Internasjonal',
-    videoUrl: 'https://www.synima.com/ai-video-agency/', 
-    contact: 'contact@synima.com',
-    kategori: 'byrå',
-    tilbyr_AI: true,
-    AI_tjenester: ['AI-video', 'AI-redigering'] 
-  },
-  { 
-    id: '8', 
-    name: 'AI Labs', 
-    segment: 'stor', 
-    desc: 'AI-drevet video-produksjonsfirma som skaper raske, kostnadseffektive AI-videoer med avatarer og automatiserte verktøy.', 
-    city: 'Remote', 
-    land: 'Internasjonal',
-    videoUrl: '', 
-    contact: 'info@ailabs.agency',
-    kategori: 'plattform',
-    tilbyr_AI: true,
-    AI_tjenester: ['AI-video'] 
-  },
-];
+  // 50 Bedrifter i Norge (Resten av landet)
+  const byer = ['Bergen', 'Trondheim', 'Stavanger', 'Tromsø', 'Kristiansand', 'Drammen', 'Fredrikstad'];
+  for (let i = 1; i <= 50; i++) {
+    mocks.push({
+      id: `norge-${i}`,
+      name: `Norge Bedrift ${i}`,
+      segment: 'norge',
+      desc: `Beskrivelse for bedrift nummer ${i} lokalisert utenfor Oslo. Rediger denne manuelt.`,
+      city: byer[i % byer.length],
+      land: 'Norge',
+      videoUrl: i % 2 === 0 ? 'https://www.w3schools.com/html/movie.mp4' : 'https://www.w3schools.com/html/mov_bbb.mp4',
+      website: 'https://www.google.com',
+      contact: `norge${i}@bedrift.no`,
+      tilbyr_AI: true,
+      AI_tjenester: ['KI-Animasjon', 'Prompt Engineering']
+    });
+  }
+  
+  return mocks;
+};
+
+// MANUELL REDIGERING: Du kan enten endre loopen over eller overstyre spesifikke indekser her.
+const MOCK_COMPANIES: Company[] = generateMocks();
 
 // --- Hovedapplikasjon ---
 const App: React.FC = () => {
@@ -157,7 +91,7 @@ const App: React.FC = () => {
       const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
       const response = await ai.models.generateContent({
         model: 'gemini-3-pro-preview',
-        contents: "Søk på internett etter faktiske norske og internasjonale bedrifter, byråer og frilansere som lager reklame ved hjelp av KI/AI (video, bilde, tekst). Finn navn, by, land, kategori, beskrivelse, nettsted og hvilke AI-tjenester de tilbyr. Finn også direktelenker til mp4-videoer eller logoer hvis de eksisterer.",
+        contents: "Søk på internett etter faktiske norske bedrifter som lager reklame ved hjelp av KI/AI. Finn navn, by, beskrivelse og nettsted.",
         config: {
           tools: [{ googleSearch: {} }],
           responseMimeType: "application/json",
@@ -168,15 +102,8 @@ const App: React.FC = () => {
               properties: {
                 navn: { type: Type.STRING },
                 nettsted: { type: Type.STRING },
-                kontakt: { type: Type.STRING },
                 beskrivelse: { type: Type.STRING },
-                tilbyr_AI: { type: Type.BOOLEAN },
-                AI_tjenester: { type: Type.ARRAY, items: { type: Type.STRING } },
-                by: { type: Type.STRING },
-                land: { type: Type.STRING },
-                kategori: { type: Type.STRING },
-                videoUrl: { type: Type.STRING },
-                logo: { type: Type.STRING }
+                by: { type: Type.STRING }
               }
             }
           }
@@ -189,14 +116,11 @@ const App: React.FC = () => {
         name: item.navn,
         desc: item.beskrivelse,
         website: item.nettsted,
-        contact: item.kontakt,
         city: item.by,
-        land: item.land,
-        kategori: item.kategori,
-        tilbyr_AI: item.tilbyr_AI,
-        AI_tjenester: item.AI_tjenester,
-        videoUrl: item.videoUrl || item.logo,
-        segment: (item.kategori === 'plattform' || item.land !== 'Norge') ? 'stor' : 'liten'
+        land: 'Norge',
+        segment: item.by?.toLowerCase() === 'oslo' ? 'oslo' : 'norge',
+        tilbyr_AI: true,
+        AI_tjenester: []
       }));
 
       setInternetResults(formatted);
@@ -218,7 +142,7 @@ const App: React.FC = () => {
             </div>
             <div className="hidden lg:block">
               <h1 className="text-xl font-black tracking-tighter uppercase leading-none">KI REKLAME</h1>
-              <p className="text-[10px] uppercase tracking-[0.2em] text-white/40 font-semibold mt-1">Små er nå store</p>
+              <p className="text-[10px] uppercase tracking-[0.2em] text-white/40 font-semibold mt-1">Norsk Katalog</p>
             </div>
           </div>
 
@@ -241,46 +165,36 @@ const App: React.FC = () => {
           </div>
         </div>
 
-        {/* Internett-resultater område i sidepanelet */}
         <div className="flex-1 flex flex-col border-t border-white/5 bg-black/20 overflow-hidden">
           <div className="p-6 border-b border-white/5 flex justify-between items-center bg-black/40">
-            <h3 className="text-[10px] font-black uppercase tracking-[0.2em] text-white/30">Funn på nettet</h3>
+            <h3 className="text-[10px] font-black uppercase tracking-[0.2em] text-white/30">AI Finder</h3>
             {isUpdating && <div className="w-3 h-3 border-2 border-blue-500 border-t-transparent rounded-full animate-spin" />}
           </div>
           <div className="flex-1 overflow-y-auto custom-scrollbar p-4 space-y-3">
-            {internetResults.length > 0 ? (
-              internetResults.map(res => (
-                <div 
-                  key={res.id} 
-                  className="p-4 rounded-xl border border-white/5 bg-white/[0.02] hover:bg-white/[0.05] transition-all group relative cursor-pointer"
-                  onClick={() => setSelectedCompany(res)}
-                >
-                  <div className="flex justify-between items-start mb-1">
-                    <h4 className="text-xs font-bold truncate pr-4 uppercase">{res.name}</h4>
-                    <button 
-                      onClick={(e) => { e.stopPropagation(); handleAddCompany(res); }}
-                      className="opacity-0 group-hover:opacity-100 transition-opacity bg-blue-600 text-[8px] font-black uppercase px-2 py-0.5 rounded text-white"
-                    >
-                      Legg til
-                    </button>
-                  </div>
-                  <p className="text-[9px] text-white/40 line-clamp-1">{res.desc}</p>
-                  <p className="text-[8px] text-blue-500/60 mt-2 font-bold uppercase tracking-widest">{res.city}, {res.land}</p>
-                </div>
-              ))
-            ) : (
-              <div className="h-full flex flex-col items-center justify-center text-center px-4">
-                <p className="text-[10px] text-white/10 uppercase font-black tracking-widest leading-relaxed">Søk etter nye bedrifter<br/>fra hele verden</p>
-                {!isUpdating && (
+             <button 
+                onClick={updateFromInternet} 
+                className="w-full text-[9px] font-black uppercase text-blue-400 hover:text-white transition-colors border border-blue-400/20 px-3 py-3 rounded-xl bg-blue-500/5 hover:bg-blue-500/10"
+              >
+                {isUpdating ? "Søker..." : "Finn nye via Internett"}
+              </button>
+            {internetResults.map(res => (
+              <div 
+                key={res.id} 
+                className="p-4 rounded-xl border border-white/5 bg-white/[0.02] hover:bg-white/[0.05] transition-all group relative cursor-pointer"
+                onClick={() => setSelectedCompany(res)}
+              >
+                <div className="flex justify-between items-start mb-1">
+                  <h4 className="text-xs font-bold truncate pr-4 uppercase">{res.name}</h4>
                   <button 
-                    onClick={updateFromInternet} 
-                    className="mt-4 text-[9px] font-black uppercase text-blue-400 hover:text-white transition-colors border border-blue-400/20 px-3 py-1.5 rounded-lg"
+                    onClick={(e) => { e.stopPropagation(); handleAddCompany(res); }}
+                    className="opacity-0 group-hover:opacity-100 transition-opacity bg-blue-600 text-[8px] font-black uppercase px-2 py-0.5 rounded text-white"
                   >
-                    Start AI-søk
+                    Lagre
                   </button>
-                )}
+                </div>
+                <p className="text-[9px] text-white/40 line-clamp-1">{res.desc}</p>
               </div>
-            )}
+            ))}
           </div>
         </div>
 
@@ -323,9 +237,16 @@ const App: React.FC = () => {
 const VideoCard: React.FC<{ company: Company; onOpen: (company: Company) => void }> = ({ company, onOpen }) => {
   const videoRef = useRef<HTMLVideoElement>(null);
 
+  const handleWebsiteClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (company.website) {
+      window.open(company.website, '_blank', 'noopener,noreferrer');
+    }
+  };
+
   return (
     <article 
-      className="group glass-card rounded-[2rem] p-5 hover:bg-white/[0.05] transition-all border-white/5 hover:border-white/10 cursor-pointer mb-6 animate-in slide-in-from-bottom-4"
+      className="group glass-card rounded-[2rem] p-5 hover:bg-white/[0.05] transition-all border-white/5 hover:border-white/10 cursor-pointer mb-6 animate-in slide-in-from-bottom-4 relative"
       onClick={() => onOpen(company)}
       onMouseEnter={() => videoRef.current?.play().catch(() => {})}
       onMouseLeave={() => { videoRef.current?.pause(); if(videoRef.current) videoRef.current.currentTime = 0; }}
@@ -338,13 +259,23 @@ const VideoCard: React.FC<{ company: Company; onOpen: (company: Company) => void
             <img src={company.videoUrl} className="w-full h-full object-cover opacity-60 group-hover:opacity-100" alt={company.name} />
           )
         ) : (
-          <div className="absolute inset-0 flex items-center justify-center text-white/10 text-4xl">{company.segment === 'liten' ? '💡' : '🏢'}</div>
+          <div className="absolute inset-0 flex items-center justify-center text-white/10 text-4xl">{company.segment === 'oslo' ? '🏛️' : '⛰️'}</div>
+        )}
+        
+        {company.website && (
+          <button 
+            onClick={handleWebsiteClick}
+            className="absolute bottom-4 right-4 bg-white/10 hover:bg-white/20 backdrop-blur-md border border-white/10 rounded-full p-2.5 opacity-0 group-hover:opacity-100 transition-all duration-300 hover:scale-110"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
+          </button>
         )}
       </div>
+      
       <h4 className="text-lg font-bold mb-1 uppercase group-hover:text-blue-400 truncate">{company.name}</h4>
       <div className="flex justify-between items-center mb-3">
-        <p className="text-[10px] text-white/40 uppercase tracking-widest font-bold truncate">{company.city || 'Digital'} {company.land ? `· ${company.land}` : ''}</p>
-        {company.tilbyr_AI && <span className="text-[9px] bg-blue-500/20 text-blue-400 px-2 py-0.5 rounded font-black uppercase flex-shrink-0">KI-Klar</span>}
+        <p className="text-[10px] text-white/40 uppercase tracking-widest font-bold truncate">{company.city || 'Digital'}</p>
+        {company.tilbyr_AI && <span className="text-[9px] bg-blue-500/20 text-blue-400 px-2 py-0.5 rounded font-black uppercase flex-shrink-0">KI-PRO</span>}
       </div>
       <p className="text-xs text-white/50 line-clamp-2 leading-relaxed">{company.desc}</p>
     </article>
@@ -353,8 +284,8 @@ const VideoCard: React.FC<{ company: Company; onOpen: (company: Company) => void
 
 // --- KatalogMode ---
 const KatalogMode: React.FC<{ companies: Company[]; setSelectedCompany: (c: Company) => void }> = ({ companies, setSelectedCompany }) => {
-  const localCompanies = companies.filter(c => c.segment === 'liten');
-  const globalCompanies = companies.filter(c => c.segment === 'stor');
+  const osloCompanies = companies.filter(c => c.segment === 'oslo');
+  const norgeCompanies = companies.filter(c => c.segment === 'norge');
 
   return (
     <div className="h-full flex flex-col overflow-hidden">
@@ -363,45 +294,43 @@ const KatalogMode: React.FC<{ companies: Company[]; setSelectedCompany: (c: Comp
         <h2 className="text-4xl lg:text-7xl font-black tracking-tighter italic mb-4 text-center lg:text-left">
           SMÅ ER NÅ <span className="text-white/20 italic">STORE</span>
         </h2>
-        <div className="flex flex-col lg:flex-row gap-6 items-center w-full">
-          <p className="text-sm lg:text-lg text-white/40 max-w-xl font-medium text-center lg:text-left leading-relaxed">
-            Den kuraterte oversikten over små bedrifter og store byråer. Finn din neste samarbeidspartner her.
-          </p>
-        </div>
+        <p className="text-sm lg:text-lg text-white/40 max-w-xl font-medium text-center lg:text-left leading-relaxed">
+          Oppdag de beste KI-bedriftene i hovedstaden og resten av landet.
+        </p>
       </section>
 
       {/* Two-Column Scrollable Area */}
       <div className="flex-1 flex flex-col lg:flex-row overflow-hidden border-t border-white/5 h-full">
-        {/* Små bedrifter */}
+        {/* Bedrifter i Oslo */}
         <section className="w-full lg:flex-1 h-full flex flex-col bg-[#050505] border-b lg:border-b-0 lg:border-r border-white/5 group/col overflow-hidden">
           <div className="p-6 bg-[#050505]/95 backdrop-blur-md border-b border-white/5 flex justify-between items-center shrink-0">
             <h3 className="text-xs font-black uppercase tracking-[0.4em] text-white/30 flex items-center gap-2">
               <span className="w-2 h-2 rounded-full bg-blue-500 shadow-[0_0_10px_rgba(59,130,246,0.5)]" />
-              Små bedrifter
+              Bedrifter i Oslo
             </h3>
-            <span className="text-[10px] text-white/10 font-bold uppercase">{localCompanies.length} bedrifter</span>
+            <span className="text-[10px] text-white/10 font-bold uppercase">{osloCompanies.length}</span>
           </div>
           <div className="flex-1 overflow-y-auto custom-scrollbar p-6 lg:p-8">
             <div className="max-w-md mx-auto space-y-2">
-              {localCompanies.map(c => <VideoCard key={c.id} company={c} onOpen={setSelectedCompany} />)}
-              <div className="h-32" /> {/* Extra space for scroll */}
+              {osloCompanies.map(c => <VideoCard key={c.id} company={c} onOpen={setSelectedCompany} />)}
+              <div className="h-32" />
             </div>
           </div>
         </section>
 
-        {/* Store byråer */}
+        {/* Bedrifter i Norge */}
         <section className="w-full lg:flex-1 h-full flex flex-col bg-black group/col overflow-hidden">
           <div className="p-6 bg-black/95 backdrop-blur-md border-b border-white/5 flex justify-between items-center shrink-0">
             <h3 className="text-xs font-black uppercase tracking-[0.4em] text-white/30 flex items-center gap-2">
               <span className="w-2 h-2 rounded-full bg-white shadow-[0_0_10px_rgba(255,255,255,0.3)]" />
-              Store byråer
+              Bedrifter i Norge
             </h3>
-            <span className="text-[10px] text-white/10 font-bold uppercase">{globalCompanies.length} bedrifter</span>
+            <span className="text-[10px] text-white/10 font-bold uppercase">{norgeCompanies.length}</span>
           </div>
           <div className="flex-1 overflow-y-auto custom-scrollbar p-6 lg:p-8">
             <div className="max-w-md mx-auto space-y-2">
-              {globalCompanies.map(c => <VideoCard key={c.id} company={c} onOpen={setSelectedCompany} />)}
-              <div className="h-32" /> {/* Extra space for scroll */}
+              {norgeCompanies.map(c => <VideoCard key={c.id} company={c} onOpen={setSelectedCompany} />)}
+              <div className="h-32" />
             </div>
           </div>
         </section>
@@ -427,11 +356,11 @@ const VideoModal: React.FC<{ company: Company; onClose: () => void; onAdd?: () =
           <button onClick={onClose} className="absolute top-8 right-8 text-white/20 hover:text-white p-2 transition-colors">✕</button>
           
           <div className="mb-10">
-            <span className={`inline-block px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-[0.2em] mb-6 ${company.segment === 'liten' ? 'bg-blue-600 text-white' : 'bg-white text-black'}`}>
-              {company.segment === 'liten' ? 'Små bedrifter' : 'Store byråer'}
+            <span className={`inline-block px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-[0.2em] mb-6 ${company.segment === 'oslo' ? 'bg-blue-600 text-white' : 'bg-white text-black'}`}>
+              {company.segment === 'oslo' ? 'Bedrift i Oslo' : 'Bedrift i Norge'}
             </span>
             <h2 className="text-4xl font-black uppercase italic mb-3 leading-none tracking-tighter">{company.name}</h2>
-            <p className="text-xs text-blue-500 font-bold uppercase tracking-[0.2em]">{company.city}{company.land ? `, ${company.land}` : ''}</p>
+            <p className="text-xs text-blue-500 font-bold uppercase tracking-[0.2em]">{company.city}</p>
           </div>
 
           <div className="space-y-8 flex-1 overflow-y-auto custom-scrollbar pr-4">
@@ -439,33 +368,27 @@ const VideoModal: React.FC<{ company: Company; onClose: () => void; onAdd?: () =
               <h5 className="text-[10px] uppercase font-black text-white/20 mb-3 tracking-widest">Beskrivelse</h5>
               <p className="text-sm text-white/70 leading-relaxed font-medium">{company.desc}</p>
             </div>
-
-            {company.AI_tjenester && company.AI_tjenester.length > 0 && (
+            {company.contact && (
               <div>
-                <h5 className="text-[10px] uppercase font-black text-white/20 mb-3 tracking-widest">AI Tjenester</h5>
-                <div className="flex flex-wrap gap-2">
-                  {company.AI_tjenester.map(t => <span key={t} className="text-[10px] bg-white/5 px-3 py-1.5 rounded-xl border border-white/10 font-bold">{t}</span>)}
-                </div>
+                <h5 className="text-[10px] uppercase font-black text-white/20 mb-1 tracking-widest">Kontakt</h5>
+                <p className="text-sm font-bold text-white/90">{company.contact}</p>
               </div>
             )}
-
-            <div className="pt-8 border-t border-white/5 space-y-6">
-              {company.contact && (
-                <div>
-                  <h5 className="text-[10px] uppercase font-black text-white/20 mb-1 tracking-widest">Kontakt</h5>
-                  <p className="text-sm font-bold text-white/90 select-all">{company.contact}</p>
-                </div>
-              )}
-              {company.website && (
-                <div>
-                  <h5 className="text-[10px] uppercase font-black text-white/20 mb-1 tracking-widest">Nettsted</h5>
-                  <a href={company.website} target="_blank" rel="noreferrer" className="text-sm font-bold hover:text-blue-400 truncate block transition-colors">{company.website}</a>
-                </div>
-              )}
-            </div>
           </div>
 
           <div className="mt-12 space-y-3">
+            {company.website && (
+              <a 
+                href={company.website} 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="w-full py-5 bg-white/10 text-white border border-white/10 rounded-[1.25rem] font-black uppercase text-xs hover:bg-white/20 transition-all text-center flex items-center justify-center gap-2 active:scale-95"
+              >
+                Gå til nettside 
+                <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
+              </a>
+            )}
+            
             {showAdd && onAdd && (
               <button onClick={onAdd} className="w-full py-5 bg-blue-600 text-white rounded-[1.25rem] font-black uppercase text-xs hover:bg-blue-500 transition-all shadow-xl shadow-blue-500/20 active:scale-95">
                 Lagre i Katalog
@@ -488,8 +411,9 @@ const RegisterModal: React.FC<{ onClose: () => void; onAdd: (c: Company) => void
     city: '', 
     contact: '', 
     videoUrl: '', 
-    land: '', 
-    segment: 'liten' as Segment 
+    website: '',
+    land: 'Norge', 
+    segment: 'oslo' as Segment 
   });
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -514,50 +438,45 @@ const RegisterModal: React.FC<{ onClose: () => void; onAdd: (c: Company) => void
           <div className="flex bg-white/5 p-1 rounded-2xl border border-white/10 mb-2">
             <button 
               type="button" 
-              onClick={() => setFormData({...formData, segment: 'liten'})}
-              className={`flex-1 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${formData.segment === 'liten' ? 'bg-blue-600 text-white shadow-lg' : 'text-white/40 hover:text-white'}`}
+              onClick={() => setFormData({...formData, segment: 'oslo', city: 'Oslo'})}
+              className={`flex-1 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${formData.segment === 'oslo' ? 'bg-blue-600 text-white shadow-lg' : 'text-white/40 hover:text-white'}`}
             >
-              Små bedrifter
+              Oslo
             </button>
             <button 
               type="button" 
-              onClick={() => setFormData({...formData, segment: 'stor'})}
-              className={`flex-1 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${formData.segment === 'stor' ? 'bg-white text-black shadow-lg' : 'text-white/40 hover:text-white'}`}
+              onClick={() => setFormData({...formData, segment: 'norge'})}
+              className={`flex-1 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${formData.segment === 'norge' ? 'bg-white text-black shadow-lg' : 'text-white/40 hover:text-white'}`}
             >
-              Store byråer
+              Resten av Norge
             </button>
           </div>
 
           <div className="space-y-4">
             <div className="space-y-1">
               <label className="text-[9px] uppercase font-black text-white/30 tracking-[0.2em] ml-1">Bedriftsnavn</label>
-              <input required placeholder="Eks: Byrå X" className="w-full bg-white/5 border border-white/10 rounded-2xl px-5 py-4 focus:border-white/40 outline-none transition-colors" value={formData.name} onChange={e => setFormData({...formData, name: e.target.value})} />
+              <input required placeholder="Navn..." className="w-full bg-white/5 border border-white/10 rounded-2xl px-5 py-4 focus:border-white/40 outline-none transition-colors" value={formData.name} onChange={e => setFormData({...formData, name: e.target.value})} />
             </div>
 
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-1">
-                <label className="text-[9px] uppercase font-black text-white/30 tracking-[0.2em] ml-1">By</label>
-                <input required placeholder="Eks: Oslo" className="w-full bg-white/5 border border-white/10 rounded-2xl px-5 py-4 focus:border-white/40 outline-none transition-colors" value={formData.city} onChange={e => setFormData({...formData, city: e.target.value})} />
-              </div>
-              <div className="space-y-1">
-                <label className="text-[9px] uppercase font-black text-white/30 tracking-[0.2em] ml-1">Land</label>
-                <input required placeholder="Eks: Norge" className="w-full bg-white/5 border border-white/10 rounded-2xl px-5 py-4 focus:border-white/40 outline-none transition-colors" value={formData.land} onChange={e => setFormData({...formData, land: e.target.value})} />
-              </div>
+            <div className="space-y-1">
+              <label className="text-[9px] uppercase font-black text-white/30 tracking-[0.2em] ml-1">By</label>
+              <input required placeholder="Eks: Bergen" className="w-full bg-white/5 border border-white/10 rounded-2xl px-5 py-4 focus:border-white/40 outline-none transition-colors" value={formData.city} onChange={e => setFormData({...formData, city: e.target.value})} disabled={formData.segment === 'oslo'} />
             </div>
 
             <div className="space-y-1">
               <label className="text-[9px] uppercase font-black text-white/30 tracking-[0.2em] ml-1">Beskrivelse</label>
-              <textarea required placeholder="Hva gjør dere unikt med KI?" className="w-full bg-white/5 border border-white/10 rounded-2xl px-5 py-4 h-28 resize-none focus:border-white/40 outline-none transition-colors" value={formData.desc} onChange={e => setFormData({...formData, desc: e.target.value})} />
+              <textarea required placeholder="Beskrivelse..." className="w-full bg-white/5 border border-white/10 rounded-2xl px-5 py-4 h-28 resize-none focus:border-white/40 outline-none transition-colors" value={formData.desc} onChange={e => setFormData({...formData, desc: e.target.value})} />
             </div>
 
-            <div className="space-y-1">
-              <label className="text-[9px] uppercase font-black text-white/30 tracking-[0.2em] ml-1">Video / Logo URL</label>
-              <input placeholder="https://..." className="w-full bg-white/5 border border-white/10 rounded-2xl px-5 py-4 focus:border-white/40 outline-none transition-colors" value={formData.videoUrl} onChange={e => setFormData({...formData, videoUrl: e.target.value})} />
-            </div>
-
-            <div className="space-y-1">
-              <label className="text-[9px] uppercase font-black text-white/30 tracking-[0.2em] ml-1">Kontakt</label>
-              <input required placeholder="E-post eller telefon" className="w-full bg-white/5 border border-white/10 rounded-2xl px-5 py-4 focus:border-white/40 outline-none transition-colors" value={formData.contact} onChange={e => setFormData({...formData, contact: e.target.value})} />
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-1">
+                <label className="text-[9px] uppercase font-black text-white/30 tracking-[0.2em] ml-1">Nettsted</label>
+                <input placeholder="https://..." className="w-full bg-white/5 border border-white/10 rounded-2xl px-5 py-4 focus:border-white/40 outline-none transition-colors" value={formData.website} onChange={e => setFormData({...formData, website: e.target.value})} />
+              </div>
+              <div className="space-y-1">
+                <label className="text-[9px] uppercase font-black text-white/30 tracking-[0.2em] ml-1">Kontakt</label>
+                <input required placeholder="E-post..." className="w-full bg-white/5 border border-white/10 rounded-2xl px-5 py-4 focus:border-white/40 outline-none transition-colors" value={formData.contact} onChange={e => setFormData({...formData, contact: e.target.value})} />
+              </div>
             </div>
           </div>
 
