@@ -347,41 +347,41 @@ const KatalogMode: React.FC<{ companies: Company[] }> = ({ companies }) => {
     <div className="h-full flex flex-col overflow-hidden">
       {/* Hero Section */}
       <section className="px-8 pt-12 pb-8 max-w-6xl mx-auto w-full flex-shrink-0">
-        <h2 className="text-4xl lg:text-7xl font-black tracking-tighter leading-none italic mb-4">
+        <h2 className="text-4xl lg:text-7xl font-black tracking-tighter leading-none italic mb-4 text-center lg:text-left">
           FREMTIDEN ER <span className="text-white/20 italic">VALGFRI</span>
         </h2>
-        <p className="text-base lg:text-lg text-white/40 max-w-2xl font-medium">
+        <p className="text-sm lg:text-lg text-white/40 max-w-2xl font-medium text-center lg:text-left mx-auto lg:mx-0">
           Vi skiller mellom lokale pionerer og globale ikoner. Velg en kolonne for å utforske hvordan KI endrer spillereglene.
         </p>
       </section>
 
-      {/* Two-Column Layout */}
-      <div className="flex-1 flex overflow-hidden border-t border-white/5">
-        {/* Left Column: Lokale Pionerer */}
-        <section className="flex-1 overflow-y-auto custom-scrollbar border-r border-white/5 bg-[#050505] relative group/col">
-          <div className="sticky top-0 z-10 p-6 bg-[#050505]/80 backdrop-blur-md border-b border-white/5 flex justify-between items-center">
+      {/* Two-Column Layout (Responsive Stacking) */}
+      <div className="flex-1 flex flex-col lg:flex-row overflow-y-auto lg:overflow-hidden border-t border-white/5 custom-scrollbar">
+        {/* Left Column: Lokale Pionerer (Top on mobile) */}
+        <section className="w-full lg:flex-1 h-auto lg:h-full lg:overflow-y-auto custom-scrollbar border-b lg:border-b-0 lg:border-r border-white/5 bg-[#050505] relative group/col">
+          <div className="sticky top-0 z-10 p-6 bg-[#050505]/95 backdrop-blur-md border-b border-white/5 flex justify-between items-center">
             <h3 className="text-xs font-black uppercase tracking-[0.4em] text-white/30">Lokale Pionerer</h3>
-            <span className="text-[10px] text-white/10 group-hover/col:text-blue-500/40 transition-colors uppercase font-bold tracking-widest">Små Team</span>
+            <span className="text-[10px] text-white/10 group-hover/col:text-blue-500/40 transition-colors uppercase font-bold tracking-widest hidden lg:block">Små Team</span>
           </div>
-          <div className="p-8 max-w-md mx-auto">
+          <div className="p-6 lg:p-8 max-w-md mx-auto">
             {localCompanies.map(c => (
               <VideoCard key={c.id} company={c} onOpen={setSelectedCompany} />
             ))}
-            <div className="h-20" /> {/* Spacer */}
+            <div className="h-10 lg:h-20" /> {/* Spacer */}
           </div>
         </section>
 
-        {/* Right Column: Globale Ikoner */}
-        <section className="flex-1 overflow-y-auto custom-scrollbar bg-black relative group/col">
-          <div className="sticky top-0 z-10 p-6 bg-black/80 backdrop-blur-md border-b border-white/5 flex justify-between items-center">
+        {/* Right Column: Globale Ikoner (Bottom on mobile) */}
+        <section className="w-full lg:flex-1 h-auto lg:h-full lg:overflow-y-auto custom-scrollbar bg-black relative group/col">
+          <div className="sticky top-0 z-10 p-6 bg-black/95 backdrop-blur-md border-b border-white/5 flex justify-between items-center">
             <h3 className="text-xs font-black uppercase tracking-[0.4em] text-white/30">Globale Ikoner</h3>
-            <span className="text-[10px] text-white/10 group-hover/col:text-purple-500/40 transition-colors uppercase font-bold tracking-widest">Brand Kampanjer</span>
+            <span className="text-[10px] text-white/10 group-hover/col:text-purple-500/40 transition-colors uppercase font-bold tracking-widest hidden lg:block">Brand Kampanjer</span>
           </div>
-          <div className="p-8 max-w-md mx-auto">
+          <div className="p-6 lg:p-8 max-w-md mx-auto">
             {globalCompanies.map(c => (
               <VideoCard key={c.id} company={c} onOpen={setSelectedCompany} />
             ))}
-            <div className="h-20" /> {/* Spacer */}
+            <div className="h-10 lg:h-20" /> {/* Spacer */}
           </div>
         </section>
       </div>
