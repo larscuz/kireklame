@@ -1,4 +1,3 @@
-
 import React, { useState, useRef } from 'react';
 import { createRoot } from 'react-dom/client';
 import { GoogleGenAI, Type } from "@google/genai";
@@ -26,46 +25,161 @@ interface Company {
 }
 
 // HJELPEFUNKSJON FOR Å GENERERE MOCK-DATA (Disse kan du redigere manuelt under)
-const generateMocks = () => {
-  const mocks: Company[] = [];
-  
-  // 50 Bedrifter i Oslo
-  for (let i = 1; i <= 50; i++) {
-    mocks.push({
-      id: `oslo-${i}`,
-      name: `Oslo Bedrift ${i}`,
-      segment: 'oslo',
-      desc: `Beskrivelse for Oslo-bedrift nummer ${i}. Rediger denne teksten manuelt i koden.`,
-      city: 'Oslo',
-      land: 'Norge',
-      videoUrl: i % 2 === 0 ? 'https://www.w3schools.com/html/mov_bbb.mp4' : 'https://www.w3schools.com/html/movie.mp4',
-      website: 'https://www.google.com',
-      contact: `oslo${i}@bedrift.no`,
-      tilbyr_AI: true,
-      AI_tjenester: ['KI-Video', 'KI-Strategi']
-    });
-  }
+const generateMocks = (): Company[] => [
+  // --- OSLO ---
+  {
+    id: 'oslo-avia',
+    name: 'AVIA Produksjon',
+    segment: 'oslo',
+    desc: 'Filmproduksjonsselskap i Oslo som kombinerer tradisjonell film og KI for å lage reklamefilm, SoMe-video og innhold raskt – fra idé til ferdig utkast.',
+    city: 'Oslo',
+    land: 'Norge',
+    website: 'https://www.aviaprod.no',
+    contact: 'hei@aviaprod.no',
+    kategori: 'byrå',
+    tilbyr_AI: true,
+    AI_tjenester: ['AI-reklamefilm', 'SoMe-video', 'KI-workshops']
+  },
+  {
+    id: 'oslo-brusjan',
+    name: 'Brusjan AS',
+    segment: 'oslo',
+    desc: 'Kreativt filmproduksjonsselskap i Oslo som lager reklame, kampanjevideoer, 3D-animasjon og VFX – ofte med AI som del av prosessen.',
+    city: 'Oslo',
+    land: 'Norge',
+    website: 'https://www.brusjan.no',
+    contact: 'halloi@brusjan.no',
+    kategori: 'byrå',
+    tilbyr_AI: true,
+    AI_tjenester: ['AI-video', '3D-animasjon', 'Motion graphics']
+  },
+  {
+    id: 'oslo-goodmorning',
+    name: 'Good Morning Naug',
+    segment: 'oslo',
+    desc: 'Digitalbyrå i Oslo med eget AI-byråtilbud – fra AI-søk og synlighet i KI-tjenester til produksjon av AI-innhold i tekst, bilde, video og lyd.',
+    city: 'Oslo',
+    land: 'Norge',
+    website: 'https://www.goodmorning.no',
+    kategori: 'byrå',
+    tilbyr_AI: true,
+    AI_tjenester: ['AI-innhold', 'AI-søk', 'Digital strategi']
+  },
+  {
+    id: 'oslo-involve',
+    name: 'Involve Advertising',
+    segment: 'oslo',
+    desc: 'Fullservicebyrå i Oslo som bruker kunstig intelligens til analyser, idéutvikling, tekst og bilde i kampanjer for norske merkevarer.',
+    city: 'Oslo',
+    land: 'Norge',
+    website: 'https://involve.no',
+    kategori: 'byrå',
+    tilbyr_AI: true,
+    AI_tjenester: ['AI-konsepter', 'Innholdsproduksjon', 'Kampanjeutvikling']
+  },
+  {
+    id: 'oslo-motherx',
+    name: 'MotherX AI',
+    segment: 'oslo',
+    desc: 'Fullservice AI-byrå i Oslo som utvikler AI-drevne løsninger for kundedialog, søk, innhold og automatisering – fra strategi til ferdig løsning.',
+    city: 'Oslo',
+    land: 'Norge',
+    website: 'https://www.motherx.ai',
+    contact: 'support@motherx.ai',
+    kategori: 'byrå',
+    tilbyr_AI: true,
+    AI_tjenester: ['AI-søk', 'AI-chat', 'Automatisering']
+  },
 
-  // 50 Bedrifter i Norge (Resten av landet)
-  const byer = ['Bergen', 'Trondheim', 'Stavanger', 'Tromsø', 'Kristiansand', 'Drammen', 'Fredrikstad'];
-  for (let i = 1; i <= 50; i++) {
-    mocks.push({
-      id: `norge-${i}`,
-      name: `Norge Bedrift ${i}`,
-      segment: 'norge',
-      desc: `Beskrivelse for bedrift nummer ${i} lokalisert utenfor Oslo. Rediger denne manuelt.`,
-      city: byer[i % byer.length],
-      land: 'Norge',
-      videoUrl: i % 2 === 0 ? 'https://www.w3schools.com/html/movie.mp4' : 'https://www.w3schools.com/html/mov_bbb.mp4',
-      website: 'https://www.google.com',
-      contact: `norge${i}@bedrift.no`,
-      tilbyr_AI: true,
-      AI_tjenester: ['KI-Animasjon', 'Prompt Engineering']
-    });
+  // --- RESTEN AV NORGE ---
+  {
+    id: 'norge-articonsult',
+    name: 'ARTI Consult',
+    segment: 'norge',
+    desc: 'Rådgivningsmiljø i Bergen som hjelper bedrifter å ta i bruk generativ KI til reelle tjenester, prototyper og kundevendte løsninger – også innen kommunikasjon og marked.',
+    city: 'Bergen',
+    land: 'Norge',
+    website: 'https://www.articonsult.no',
+    kategori: 'rådgiver',
+    tilbyr_AI: true,
+    AI_tjenester: ['Generativ KI-rådgivning', 'Strategi', 'Prototyping']
+  },
+  {
+    id: 'norge-webfabrikk',
+    name: 'Webfabrikk',
+    segment: 'norge',
+    desc: 'AI-drevet markedsføringsbyrå på Billingstad som kombinerer SEO, webdesign og kunstig intelligens for å skape flere relevante leads og reklamekampanjer på nett.',
+    city: 'Billingstad',
+    land: 'Norge',
+    website: 'https://webfabrikk.com',
+    kategori: 'byrå',
+    tilbyr_AI: true,
+    AI_tjenester: ['AI-markedsføring', 'SEO & AI', 'Nettsider']
+  },
+  {
+    id: 'norge-essentialmedia',
+    name: 'Essential Media',
+    segment: 'norge',
+    desc: 'Byrå i Tromsø som bruker data, automatisering og kunstig intelligens til å optimalisere kampanjer, innhold og kundereiser for små og mellomstore bedrifter.',
+    city: 'Tromsø',
+    land: 'Norge',
+    website: 'https://essentialmedia.no',
+    contact: 'espen@essentialmedia.no',
+    kategori: 'byrå',
+    tilbyr_AI: true,
+    AI_tjenester: ['Performance-markedsføring', 'Automatisering', 'Dataanalyse']
+  },
+  {
+    id: 'norge-preferium',
+    name: 'Preferium',
+    segment: 'norge',
+    desc: 'Digitalt byrå som bruker AI til SEO, innholdsproduksjon og video for å gi bedrifter synlighet i søk og sosiale medier.',
+    city: 'Fredrikstad',
+    land: 'Norge',
+    website: 'https://preferium.no',
+    contact: 'post@preferium.no',
+    kategori: 'byrå',
+    tilbyr_AI: true,
+    AI_tjenester: ['AI-SEO', 'AI-innhold', 'Digital strategi']
+  },
+  {
+    id: 'norge-aichatnorge',
+    name: 'AIChat Norge',
+    segment: 'norge',
+    desc: 'Selskap som bygger AI-drevne chatløsninger og kundedialog for norske bedrifter, og leverer nettsider og markedsføring hvor KI står for mye av tekst og flyt.',
+    city: 'Tolvsrød',
+    land: 'Norge',
+    website: 'https://aichatnorge.no',
+    kategori: 'plattform',
+    tilbyr_AI: true,
+    AI_tjenester: ['AI-chatbot', 'Automatisert kundeservice', 'Lead-innsamling']
+  },
+  {
+    id: 'norge-bolgenreklame',
+    name: 'Bølgen Reklamebyrå',
+    segment: 'norge',
+    desc: 'Reklamebyrå som kombinerer tradisjonell kommunikasjon med KI-generert innhold, film og grafikk for kunder langs kysten og i resten av landet.',
+    city: 'Sandnes',
+    land: 'Norge',
+    website: 'https://www.blgn.no',
+    contact: 'aloha@blgn.no',
+    kategori: 'byrå',
+    tilbyr_AI: true,
+    AI_tjenester: ['AI-innhold', 'Reklamefilm', 'Visuell design']
+  },
+  {
+    id: 'norge-treffsikker',
+    name: 'Treffsikker',
+    segment: 'norge',
+    desc: 'Resultatorientert byrå fra Nes på Hedmarken som bruker kunstig intelligens til annonsering, sporing og løpende optimalisering av kampanjer.',
+    city: 'Nes på Hedmarken',
+    land: 'Norge',
+    website: 'https://treffsikker.no',
+    kategori: 'byrå',
+    tilbyr_AI: true,
+    AI_tjenester: ['AI-annonsering', 'Sporing & analyse', 'Konverteringsoptimalisering']
   }
-  
-  return mocks;
-};
+];
 
 // MANUELL REDIGERING: Du kan enten endre loopen over eller overstyre spesifikke indekser her.
 const MOCK_COMPANIES: Company[] = generateMocks();
@@ -382,7 +496,7 @@ const VideoModal: React.FC<{ company: Company; onClose: () => void; onAdd?: () =
                 href={company.website} 
                 target="_blank" 
                 rel="noopener noreferrer"
-                className="w-full py-5 bg-white/10 text-white border border-white/10 rounded-[1.25rem] font-black uppercase text-xs hover:bg-white/20 transition-all text-center flex items-center justify-center gap-2 active:scale-95"
+                className="w-full py-5 bg-white/10 text-white border border-white/10 rounded-[1.25rem] font-black uppercase text-xs hover:bg-white/20 transition-all text-center flex itemscenter justify-center gap-2 active:scale-95"
               >
                 Gå til nettside 
                 <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
@@ -435,7 +549,7 @@ const RegisterModal: React.FC<{ onClose: () => void; onAdd: (c: Company) => void
         <h2 className="text-3xl font-black uppercase italic mb-8 tracking-tighter">Registrer bedrift</h2>
         
         <form onSubmit={handleSubmit} className="space-y-6">
-          <div className="flex bg-white/5 p-1 rounded-2xl border border-white/10 mb-2">
+          <div className="flex bgwhite/5 p-1 rounded-2xl border border-white/10 mb-2">
             <button 
               type="button" 
               onClick={() => setFormData({...formData, segment: 'oslo', city: 'Oslo'})}
