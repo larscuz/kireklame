@@ -1,0 +1,23 @@
+
+<svg width="1024" height="1024" viewBox="0 0 1024 1024" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="1024" height="1024" fill="#1581C5"/>
+  <g fill="white">
+    <!-- K -->
+    <path d="M292 250H372V390L470 250H560L440 420L570 610H475L372 460V610H292V250Z" />
+    <!-- i -->
+    <path d="M605 385H680V610H605V385Z" />
+    <!-- i-dot -->
+    <circle cx="642.5" cy="300" r="45" />
+    <!-- period -->
+    <circle cx="750" cy="540" r="45" />
+    <!-- N -->
+    <path d="M292 680H375L485 890V680H565V1040H482L372 830V1040H292V680Z" transform="translate(0, -150)"/>
+    <!-- O -->
+    <path d="M700 860C700 965 655 1045 565 1045C475 1045 430 965 430 860C430 755 475 675 565 675C655 675 700 755 700 860ZM620 860C620 795 600 750 565 750C530 750 510 795 510 860C510 925 530 970 565 970C600 970 620 925 620 860Z" transform="translate(140, -150)"/>
+  </g>
+  <!-- Overriding text for a cleaner look that scales better as favicon -->
+  <text x="500" y="480" text-anchor="middle" fill="white" font-family="system-ui, sans-serif" font-weight="900" font-size="440" letter-spacing="-20">Ki.</text>
+  <text x="512" y="860" text-anchor="middle" fill="white" font-family="system-ui, sans-serif" font-weight="900" font-size="440" letter-spacing="10">NO</text>
+  <!-- Background Rect again to ensure solid color if text is used -->
+  <rect width="1024" height="1024" fill="#1581C5" style="mix-blend-mode: destination-over;"/>
+</svg>

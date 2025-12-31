@@ -40,7 +40,7 @@ const generateMocks = () => {
   ];
 
   const norgeData: Partial<Company>[] = [
-    { name: 'Synlighet (Bergen)', city: 'Bergen', website: 'https://synlighet.no', videoUrl: 'https://www.youtube.com/embed/F6mN_D0Z1oQ', desc: 'Hovedkontoret til Synlighet med fokus på performance og strategi.' },
+    { name: 'Synlighet (Bergen)', city: 'Bergen', website: 'https://synlighet.no', videoUrl: 'https://www.youtube.com/embed/F6mN_D0Z1oQ', desc: 'Hovedkontoret til Synlighet med fokus på performance and strategi.' },
     { name: 'Attentio', city: 'Bergen', website: 'https://www.attentio.no', desc: 'Spesialister på digital synlighet og innhold i Bergen.' },
     { name: 'TenneT', city: 'Bergen', website: 'https://tennet.no', desc: 'Leverer moderne digitale tjenester og markedsføringsløsninger.' },
     { name: 'Cannonball PR', city: 'Bergen', website: 'https://www.cannonballpr.no', desc: 'PR og kommunikasjonsbyrå med hjerte for gode historier.' },
@@ -123,8 +123,8 @@ const App: React.FC = () => {
       <nav className="w-24 lg:w-80 border-r border-white/5 flex flex-col bg-[#050505] z-50">
         <div className="p-6">
           <div className="mb-12 flex items-center gap-4 px-2">
-            <div className="w-10 h-10 rounded-xl bg-blue-600 flex items-center justify-center shadow-[0_0_20px_rgba(37,99,235,0.4)] cursor-pointer" onClick={() => setView('katalog')}>
-              <span className="text-white font-black text-xs italic">KI</span>
+            <div className="w-12 h-12 rounded-xl flex items-center justify-center shadow-[0_0_20px_rgba(21,129,197,0.3)] cursor-pointer overflow-hidden border border-white/10" onClick={() => setView('katalog')}>
+              <img src="logo.svg" alt="Ki.NO" className="w-full h-full object-cover" />
             </div>
             <div className="hidden lg:block cursor-pointer" onClick={() => setView('katalog')}>
               <h1 className="text-xl font-black tracking-tighter uppercase leading-none">KI REKLAME</h1>
@@ -225,7 +225,7 @@ const TrainingPage: React.FC = () => (
         </div>
         <div className="glass-card p-10 rounded-[2rem] border-blue-500/20 self-start sticky top-0">
           <h4 className="text-xl font-black mb-4 uppercase italic">Klar for kurs?</h4>
-          <p className="text-sm text-white/60 mb-8 leading-relaxed">Vi skreddersyr opplæring for markedsavdelinger og kreative team som ønsker å ta eierskap over KI-verktøyene.</p>
+          <p className="text-sm text-white/60 mb-8 leading-relaxed">Vi skreddersyr opplæring for markedsavdelinger and kreative team som ønsker å ta eierskap over KI-verktøyene.</p>
           <a href={`mailto:${CONTACT_EMAIL}?subject=Forespørsel om KI-Opplæring`} className="w-full block py-5 bg-white text-black rounded-2xl font-black uppercase text-xs hover:scale-[1.03] active:scale-95 transition-all mb-4 text-center">Kontakt Cuz Media</a>
           <p className="text-center text-[10px] text-white/20 font-bold uppercase tracking-widest">Kurs holdes i Oslo eller digitalt</p>
         </div>
