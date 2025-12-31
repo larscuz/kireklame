@@ -1,7 +1,6 @@
 
-import React, { useState, useRef } from 'react';
+import React, { useState } from 'react';
 import { createRoot } from 'react-dom/client';
-import { GoogleGenAI, Type } from "@google/genai";
 
 // --- Typer ---
 type Segment = 'oslo' | 'norge';
@@ -16,8 +15,6 @@ interface Company {
   videoUrl?: string;
   website?: string;
   contact?: string;
-  tilbyr_AI?: boolean;
-  AI_tjenester?: string[];
 }
 
 const CONTACT_EMAIL = "x@larscuzner.com";
@@ -62,7 +59,7 @@ const generateMocks = () => {
   const allMocks: Company[] = [];
 
   for (let i = 0; i < 50; i++) {
-    const data = osloData[i] || { name: `Ledig plass Oslo #${i + 1}`, website: '', desc: 'Her kan du legge til en ny bedrift manuelt i koden.' };
+    const data = osloData[i] || { name: `Selskap Oslo #${i + 1}`, website: '', desc: 'Innovativ bedrift med fokus på fremtidens løsninger.' };
     allMocks.push({
       id: `oslo-${i}`,
       name: data.name!,
@@ -71,14 +68,12 @@ const generateMocks = () => {
       city: 'Oslo',
       videoUrl: data.videoUrl || '',
       website: data.website || '',
-      contact: 'kontakt@bedrift.no',
-      tilbyr_AI: true,
-      AI_tjenester: ['KI-Reklame']
+      contact: CONTACT_EMAIL
     });
   }
 
   for (let i = 0; i < 50; i++) {
-    const data = norgeData[i] || { name: `Ledig plass Norge #${i + 1}`, website: '', desc: 'Her kan du legge til en ny bedrift manuelt i koden.' };
+    const data = norgeData[i] || { name: `Selskap Norge #${i + 1}`, city: 'Norge', website: '', desc: 'Lokalt forankret bedrift som tar i bruk moderne verktøy.' };
     allMocks.push({
       id: `norge-${i}`,
       name: data.name!,
@@ -87,9 +82,7 @@ const generateMocks = () => {
       city: data.city || 'Norge',
       videoUrl: data.videoUrl || '',
       website: data.website || '',
-      contact: 'kontakt@bedrift.no',
-      tilbyr_AI: true,
-      AI_tjenester: ['KI-Reklame']
+      contact: CONTACT_EMAIL
     });
   }
 
@@ -103,22 +96,27 @@ const MediaDisplay: React.FC<{ url?: string; autoPlay?: boolean; muted?: boolean
   if (!url) return null;
   const isYouTube = url.includes('youtube.com') || url.includes('youtu.be');
   const isVideoFile = url.match(/\.(mp4|webm|ogg)$/i);
-  const isImage = url.match(/\.(jpg|jpeg|png|gif|svg|webp)$/i);
 
   if (isYouTube) {
     const embedUrl = url.includes('embed') ? url : url.replace('watch?v=', 'embed/').split('&')[0];
     return <iframe src={`${embedUrl}?autoplay=${autoPlay ? 1 : 0}&mute=${muted ? 1 : 0}&controls=0&loop=1`} className="w-full h-full border-none" allow="autoplay; encrypted-media" />;
   }
-  if (isVideoFile) return <video src={url} className="w-full h-full object-cover" autoPlay={autoPlay} muted={muted} loop />;
-  if (isImage || !isVideoFile) return <img src={url} className="w-full h-full object-cover" alt="Media" />;
-  return null;
+  if (isVideoFile) return <video src={url} className="w-full h-full object-cover" autoPlay={autoPlay} muted={muted} loop playsInline />;
+  return <div className="w-full h-full bg-zinc-900 flex items-center justify-center text-white/10 font-black italic">VIDEO_NULL</div>;
 };
 
 // --- App ---
 const App: React.FC = () => {
   const [view, setView] = useState<View>('katalog');
-  const [companies, setCompanies] = useState<Company[]>(MOCK_COMPANIES);
+  const [companies] = useState<Company[]>(MOCK_COMPANIES);
   const [selectedCompany, setSelectedCompany] = useState<Company | null>(null);
+
+  const sidebarItemClass = (active: boolean) => 
+    `w-full flex items-center gap-4 px-4 py-3.5 rounded-2xl border transition-all duration-300 ${
+      active 
+      ? 'border-blue-500/50 bg-blue-500/10 text-white shadow-xl shadow-blue-500/5' 
+      : 'border-white/5 text-white/40 hover:text-white hover:bg-white/5'
+    }`;
 
   return (
     <div className="flex h-screen bg-black text-white overflow-hidden selection:bg-blue-500/30">
@@ -135,10 +133,7 @@ const App: React.FC = () => {
           </div>
 
           <div className="space-y-4">
-            <button 
-              onClick={() => setView('katalog')} 
-              className={`w-full flex items-center gap-4 px-4 py-3.5 rounded-2xl border transition-all ${view === 'katalog' ? 'border-white/20 bg-white/10 text-white shadow-xl' : 'border-white/5 text-white/40 hover:text-white'}`}
-            >
+            <button onClick={() => setView('katalog')} className={sidebarItemClass(view === 'katalog')}>
               <span className="text-xl">📁</span>
               <div className="hidden lg:block text-left">
                 <p className="font-bold text-sm tracking-tight">Katalog</p>
@@ -146,10 +141,7 @@ const App: React.FC = () => {
               </div>
             </button>
 
-            <button 
-              onClick={() => setView('opplæring')} 
-              className={`w-full flex items-center gap-4 px-4 py-3.5 rounded-2xl border transition-all ${view === 'opplæring' ? 'border-blue-500/50 bg-blue-500/10 text-white shadow-xl shadow-blue-500/5' : 'border-white/5 text-white/40 hover:text-white'}`}
-            >
+            <button onClick={() => setView('opplæring')} className={sidebarItemClass(view === 'opplæring')}>
               <span className="text-xl">🎓</span>
               <div className="hidden lg:block text-left">
                 <p className="font-bold text-sm tracking-tight">KI-Opplæring</p>
@@ -157,10 +149,7 @@ const App: React.FC = () => {
               </div>
             </button>
 
-            <button 
-              onClick={() => setView('foredrag')} 
-              className={`w-full flex items-center gap-4 px-4 py-3.5 rounded-2xl border transition-all ${view === 'foredrag' ? 'border-blue-500/50 bg-blue-500/10 text-white shadow-xl shadow-blue-500/5' : 'border-white/5 text-white/40 hover:text-white'}`}
-            >
+            <button onClick={() => setView('foredrag')} className={sidebarItemClass(view === 'foredrag')}>
               <span className="text-xl">🎤</span>
               <div className="hidden lg:block text-left">
                 <p className="font-bold text-sm tracking-tight">Foredrag</p>
@@ -168,11 +157,8 @@ const App: React.FC = () => {
               </div>
             </button>
             
-            <a 
-              href={`mailto:${CONTACT_EMAIL}`}
-              className="w-full flex items-center gap-4 px-4 py-3.5 rounded-2xl border border-white/5 hover:border-white/20 text-white/40 hover:text-white transition-all"
-            >
-              <span className="text-lg">➕</span>
+            <a href={`mailto:${CONTACT_EMAIL}?subject=Send inn ny bedrift til katalogen`} className="w-full flex items-center gap-4 px-4 py-3.5 rounded-2xl border border-white/5 hover:border-white/20 text-white/40 hover:text-white transition-all group">
+              <span className="text-lg group-hover:scale-110 transition-transform">➕</span>
               <div className="hidden lg:block text-left">
                 <p className="font-bold text-xs tracking-tight">Send inn ny bedrift</p>
               </div>
@@ -182,12 +168,12 @@ const App: React.FC = () => {
         
         <div className="flex-1" />
         <div className="p-6 border-t border-white/5">
-          <div className="p-4 rounded-2xl bg-white/[0.02] text-[10px] text-white/30 space-y-1">
+          <div className="p-4 rounded-2xl bg-white/[0.02] text-[10px] text-white/30 space-y-2">
              <p className="flex items-center gap-2 font-bold text-white/60">
-              <span className="w-1.5 h-1.5 rounded-full bg-blue-500 animate-pulse" />
+              <span className="w-1.5 h-1.5 rounded-full bg-blue-500 animate-pulse shadow-[0_0_8px_#3b82f6]" />
               Drevet av Cuz Media
             </p>
-            <p>© 2025 KI Reklame Norge</p>
+            <p className="opacity-50">© 2025 KI Reklame Norge</p>
           </div>
         </div>
       </nav>
@@ -212,8 +198,8 @@ const TrainingPage: React.FC = () => (
       <span className="text-blue-500 font-black uppercase tracking-[0.3em] text-[10px] mb-4 block">Opplæring av Cuz Media</span>
       <h2 className="text-5xl lg:text-7xl font-black italic tracking-tighter mb-10 leading-none">LAG DINE EGNE <br/> <span className="text-white/20">KI-REKLAMER</span></h2>
       
-      <div className="aspect-video rounded-[2.5rem] bg-zinc-900 border border-white/10 overflow-hidden mb-12 shadow-2xl relative">
-        <video src="https://www.w3schools.com/html/mov_bbb.mp4" className="w-full h-full object-cover opacity-80" controls autoPlay muted loop />
+      <div className="aspect-video rounded-[2.5rem] bg-zinc-900 border border-white/10 overflow-hidden mb-12 shadow-2xl relative group">
+        <video src="https://www.w3schools.com/html/mov_bbb.mp4" className="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-opacity" controls autoPlay muted loop />
         <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent pointer-events-none" />
       </div>
 
@@ -228,19 +214,19 @@ const TrainingPage: React.FC = () => (
               { t: 'Arbeidsflyt', d: 'Hvordan kutte produksjonstiden fra uker til timer.' }
             ].map(item => (
               <li key={item.t} className="flex gap-4 group">
-                <div className="w-1 h-12 bg-blue-600 group-hover:h-16 transition-all" />
+                <div className="w-1 h-12 bg-blue-600 group-hover:h-16 transition-all duration-500" />
                 <div>
-                  <h4 className="font-black text-sm uppercase mb-1">{item.t}</h4>
+                  <h4 className="font-black text-sm uppercase mb-1 tracking-tight">{item.t}</h4>
                   <p className="text-sm text-white/40 leading-relaxed">{item.d}</p>
                 </div>
               </li>
             ))}
           </ul>
         </div>
-        <div className="glass-card p-10 rounded-[2rem] border-blue-500/20 self-start">
+        <div className="glass-card p-10 rounded-[2rem] border-blue-500/20 self-start sticky top-0">
           <h4 className="text-xl font-black mb-4 uppercase italic">Klar for kurs?</h4>
           <p className="text-sm text-white/60 mb-8 leading-relaxed">Vi skreddersyr opplæring for markedsavdelinger og kreative team som ønsker å ta eierskap over KI-verktøyene.</p>
-          <a href={`mailto:${CONTACT_EMAIL}`} className="w-full block py-5 bg-white text-black rounded-2xl font-black uppercase text-xs hover:scale-105 active:scale-95 transition-all mb-4 text-center">Kontakt Cuz Media</a>
+          <a href={`mailto:${CONTACT_EMAIL}?subject=Forespørsel om KI-Opplæring`} className="w-full block py-5 bg-white text-black rounded-2xl font-black uppercase text-xs hover:scale-[1.03] active:scale-95 transition-all mb-4 text-center">Kontakt Cuz Media</a>
           <p className="text-center text-[10px] text-white/20 font-bold uppercase tracking-widest">Kurs holdes i Oslo eller digitalt</p>
         </div>
       </div>
@@ -263,16 +249,16 @@ const KeynotePage: React.FC = () => (
           <h3 className="text-2xl font-bold italic uppercase tracking-tight">Temaer i foredraget</h3>
           <div className="space-y-4">
              {['KI-revolusjonen i reklamebransjen', 'Slik sparer store merkevarer millioner', 'Etikk og autentisitet i en syntetisk verden', 'Fremtidens kreative roller'].map(t => (
-               <div key={t} className="p-6 rounded-2xl bg-white/[0.03] border border-white/5 hover:border-white/20 transition-all cursor-default">
+               <div key={t} className="p-6 rounded-2xl bg-white/[0.03] border border-white/5 hover:border-white/20 hover:bg-white/[0.05] transition-all cursor-default">
                  <p className="font-bold text-sm tracking-tight">{t}</p>
                </div>
              ))}
           </div>
         </div>
-        <div className="glass-card p-10 rounded-[2rem] border-white/10 self-start">
+        <div className="glass-card p-10 rounded-[2rem] border-white/10 self-start sticky top-0">
           <h4 className="text-xl font-black mb-4 uppercase italic">Book Cuz Media</h4>
           <p className="text-sm text-white/60 mb-8 leading-relaxed">Vi holder inspirerende foredrag for ledergrupper, konferanser og fagmiljøer som ønsker å forstå kraften i generativ KI.</p>
-          <a href={`mailto:${CONTACT_EMAIL}`} className="w-full block py-5 bg-blue-600 text-white rounded-2xl font-black uppercase text-xs hover:bg-blue-500 active:scale-95 transition-all mb-4 shadow-xl shadow-blue-500/20 text-center">Send forespørsel</a>
+          <a href={`mailto:${CONTACT_EMAIL}?subject=Forespørsel om Foredrag`} className="w-full block py-5 bg-blue-600 text-white rounded-2xl font-black uppercase text-xs hover:bg-blue-500 hover:scale-[1.03] active:scale-95 transition-all mb-4 shadow-xl shadow-blue-500/20 text-center">Send forespørsel</a>
           <p className="text-center text-[10px] text-white/20 font-bold uppercase tracking-widest">Tilgjengelig for oppdrag i hele Norge</p>
         </div>
       </div>
@@ -282,17 +268,30 @@ const KeynotePage: React.FC = () => (
 
 // --- KatalogModuler ---
 const VideoCard: React.FC<{ company: Company; onOpen: (c: Company) => void }> = ({ company, onOpen }) => {
+  const hasVideo = !!(company.videoUrl && company.videoUrl.trim() !== '');
   return (
-    <article className="group glass-card rounded-[2rem] p-5 hover:bg-white/[0.06] transition-all border-white/5 hover:border-blue-500/30 cursor-pointer mb-6 animate-in slide-in-from-bottom-4 relative overflow-hidden" onClick={() => onOpen(company)}>
+    <article 
+      className={`group glass-card rounded-[2rem] p-5 hover:bg-white/[0.06] transition-all border-white/5 hover:border-blue-500/30 cursor-pointer mb-6 animate-in slide-in-from-bottom-4 relative overflow-hidden ${!hasVideo ? 'opacity-70 grayscale-[0.5] hover:opacity-100 hover:grayscale-0' : ''}`} 
+      onClick={() => onOpen(company)}
+    >
       <div className="aspect-video rounded-2xl bg-zinc-900/50 border border-white/5 mb-5 overflow-hidden relative group-hover:shadow-[0_0_30px_rgba(59,130,246,0.1)] transition-all">
-        {company.videoUrl ? <MediaDisplay url={company.videoUrl} autoPlay={false} /> : <div className="absolute inset-0 flex items-center justify-center text-white/5 font-black text-2xl uppercase tracking-tighter">{company.name}</div>}
+        {hasVideo ? (
+          <MediaDisplay url={company.videoUrl} autoPlay={false} />
+        ) : (
+          <div className="absolute inset-0 flex items-center justify-center text-white/5 font-black text-2xl uppercase tracking-tighter text-center px-4">
+            {company.name}
+          </div>
+        )}
         {company.website && (
           <button onClick={(e) => { e.stopPropagation(); window.open(company.website, '_blank'); }} className="absolute bottom-4 right-4 bg-white/10 hover:bg-white/20 backdrop-blur-md border border-white/10 rounded-full p-2.5 opacity-0 group-hover:opacity-100 transition-all hover:scale-110 active:scale-95">
             <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
           </button>
         )}
       </div>
-      <h4 className="text-lg font-bold mb-1 uppercase group-hover:text-blue-400 truncate tracking-tight">{company.name}</h4>
+      <div className="flex justify-between items-start gap-2 mb-1">
+        <h4 className="text-lg font-bold uppercase group-hover:text-blue-400 truncate tracking-tight">{company.name}</h4>
+        {hasVideo && <span className="bg-blue-500/20 text-blue-400 text-[8px] font-black px-2 py-0.5 rounded-full uppercase">Video</span>}
+      </div>
       <p className="text-[10px] text-white/40 uppercase tracking-widest font-black mb-3">{company.city}</p>
       <p className="text-xs text-white/50 line-clamp-2 leading-relaxed h-8">{company.desc}</p>
     </article>
@@ -300,22 +299,48 @@ const VideoCard: React.FC<{ company: Company; onOpen: (c: Company) => void }> = 
 };
 
 const KatalogMode: React.FC<{ companies: Company[]; setSelectedCompany: (c: Company) => void }> = ({ companies, setSelectedCompany }) => {
-  const oslo = companies.filter(c => c.segment === 'oslo');
-  const norge = companies.filter(c => c.segment === 'norge');
+  // Sortering: bedrifter med videoUrl kommer først
+  const sortPriority = (a: Company, b: Company) => {
+    const hasA = !!(a.videoUrl && a.videoUrl.trim() !== '');
+    const hasB = !!(b.videoUrl && b.videoUrl.trim() !== '');
+    if (hasA && !hasB) return -1;
+    if (!hasA && hasB) return 1;
+    return a.name.localeCompare(b.name);
+  };
+
+  const oslo = companies.filter(c => c.segment === 'oslo').sort(sortPriority);
+  const norge = companies.filter(c => c.segment === 'norge').sort(sortPriority);
+
   return (
     <div className="h-full flex flex-col">
-      <header className="px-10 pt-16 pb-12 shrink-0">
-        <h2 className="text-5xl lg:text-8xl font-black tracking-tighter italic mb-4">NORSK <span className="text-white/20">KI-KATALOG</span></h2>
-        <p className="text-sm lg:text-lg text-white/30 max-w-2xl font-medium">En kuratert oversikt over norske byråer og bedrifter som leder an innen AI-reklame.</p>
+      <header className="px-10 pt-16 pb-12 shrink-0 relative overflow-hidden">
+        <h2 className="text-5xl lg:text-8xl font-black tracking-tighter italic mb-4 relative z-10">NORSK <span className="text-white/20">KI-KATALOG</span></h2>
+        <p className="text-sm lg:text-lg text-white/30 max-w-2xl font-medium relative z-10">En kuratert oversikt over norske byråer og bedrifter som leder an innen AI-reklame. <span className="text-blue-500/50">Prioritert etter innhold.</span></p>
       </header>
       <div className="flex-1 flex flex-col lg:flex-row overflow-hidden border-t border-white/5">
         <section className="w-full lg:flex-1 h-full flex flex-col border-r border-white/5">
-          <div className="p-6 bg-black/50 backdrop-blur-xl border-b border-white/5 flex justify-between items-center z-10"><h3 className="text-xs font-black uppercase tracking-[0.4em] text-blue-500 flex items-center gap-3"><span className="w-2 h-2 rounded-full bg-blue-500 shadow-[0_0_10px_blue]" />Bedrifter i Oslo</h3><span className="text-[10px] font-black text-white/20 uppercase">{oslo.length}</span></div>
-          <div className="flex-1 overflow-y-auto custom-scrollbar p-8"><div className="max-w-md mx-auto">{oslo.map(c => <VideoCard key={c.id} company={c} onOpen={setSelectedCompany} />)}</div></div>
+          <div className="p-6 bg-black/50 backdrop-blur-xl border-b border-white/5 flex justify-between items-center z-10">
+            <h3 className="text-xs font-black uppercase tracking-[0.4em] text-blue-500 flex items-center gap-3">
+              <span className="w-2 h-2 rounded-full bg-blue-500 shadow-[0_0_10px_#3b82f6]" />
+              Oslo
+            </h3>
+            <span className="text-[10px] font-black text-white/20 uppercase tracking-widest">{oslo.length} Bedrifter</span>
+          </div>
+          <div className="flex-1 overflow-y-auto custom-scrollbar p-8">
+            <div className="max-w-md mx-auto">{oslo.map(c => <VideoCard key={c.id} company={c} onOpen={setSelectedCompany} />)}</div>
+          </div>
         </section>
         <section className="w-full lg:flex-1 h-full flex flex-col bg-[#020202]">
-          <div className="p-6 bg-black/50 backdrop-blur-xl border-b border-white/5 flex justify-between items-center z-10"><h3 className="text-xs font-black uppercase tracking-[0.4em] text-white/40 flex items-center gap-3"><span className="w-2 h-2 rounded-full bg-white/40" />Bedrifter i Norge</h3><span className="text-[10px] font-black text-white/20 uppercase">{norge.length}</span></div>
-          <div className="flex-1 overflow-y-auto custom-scrollbar p-8"><div className="max-w-md mx-auto">{norge.map(c => <VideoCard key={c.id} company={c} onOpen={setSelectedCompany} />)}</div></div>
+          <div className="p-6 bg-black/50 backdrop-blur-xl border-b border-white/5 flex justify-between items-center z-10">
+            <h3 className="text-xs font-black uppercase tracking-[0.4em] text-white/40 flex items-center gap-3">
+              <span className="w-2 h-2 rounded-full bg-white/40" />
+              Norge
+            </h3>
+            <span className="text-[10px] font-black text-white/20 uppercase tracking-widest">{norge.length} Bedrifter</span>
+          </div>
+          <div className="flex-1 overflow-y-auto custom-scrollbar p-8">
+            <div className="max-w-md mx-auto">{norge.map(c => <VideoCard key={c.id} company={c} onOpen={setSelectedCompany} />)}</div>
+          </div>
         </section>
       </div>
     </div>
@@ -324,17 +349,37 @@ const KatalogMode: React.FC<{ companies: Company[]; setSelectedCompany: (c: Comp
 
 const VideoModal: React.FC<{ company: Company; onClose: () => void }> = ({ company, onClose }) => {
   return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4" onClick={onClose}>
+    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 animate-in fade-in duration-300" onClick={onClose}>
       <div className="absolute inset-0 bg-black/98 backdrop-blur-3xl" />
       <div className="relative w-full max-w-6xl bg-[#080808] border border-white/10 rounded-[3rem] overflow-hidden flex flex-col lg:flex-row shadow-[0_0_100px_rgba(0,0,0,0.8)]" onClick={e => e.stopPropagation()}>
-        <div className="flex-1 bg-black flex items-center justify-center min-h-[400px]"><MediaDisplay url={company.videoUrl} autoPlay={true} muted={false} /></div>
-        <div className="w-full lg:w-[450px] p-12 border-l border-white/5 bg-zinc-950 flex flex-col">
-          <button onClick={onClose} className="absolute top-8 right-8 text-white/20 hover:text-white transition-colors">✕</button>
-          <div className="mb-10"><h2 className="text-4xl font-black uppercase italic mb-2 tracking-tighter leading-none">{company.name}</h2><p className="text-xs text-blue-500 font-bold uppercase tracking-[0.2em]">{company.city}</p></div>
-          <div className="space-y-8 flex-1"><div><h5 className="text-[10px] uppercase font-black text-white/20 mb-3 tracking-widest">Om bedriften</h5><p className="text-sm text-white/70 leading-relaxed">{company.desc}</p></div>{company.contact && (<div><h5 className="text-[10px] uppercase font-black text-white/20 mb-1 tracking-widest">Kontakt</h5><p className="text-sm font-bold text-white">{company.contact}</p></div>)}</div>
+        <div className="flex-1 bg-black flex items-center justify-center min-h-[400px]">
+          <MediaDisplay url={company.videoUrl} autoPlay={true} muted={false} />
+        </div>
+        <div className="w-full lg:w-[450px] p-12 border-l border-white/5 bg-zinc-950 flex flex-col relative">
+          <button onClick={onClose} className="absolute top-8 right-8 text-white/20 hover:text-white transition-colors w-10 h-10 flex items-center justify-center rounded-full hover:bg-white/5">✕</button>
+          <div className="mb-10 pt-4">
+            <h2 className="text-4xl font-black uppercase italic mb-2 tracking-tighter leading-none">{company.name}</h2>
+            <p className="text-xs text-blue-500 font-bold uppercase tracking-[0.2em]">{company.city}</p>
+          </div>
+          <div className="space-y-8 flex-1">
+            <div>
+              <h5 className="text-[10px] uppercase font-black text-white/20 mb-3 tracking-widest">Beskrivelse</h5>
+              <p className="text-sm text-white/70 leading-relaxed font-medium">{company.desc}</p>
+            </div>
+            <div>
+              <h5 className="text-[10px] uppercase font-black text-white/20 mb-1 tracking-widest">Kontaktpunkt</h5>
+              <p className="text-sm font-bold text-white opacity-80">{CONTACT_EMAIL}</p>
+            </div>
+          </div>
           <div className="mt-12 space-y-3">
-            {company.website && <a href={company.website} target="_blank" className="w-full py-5 bg-white text-black rounded-2xl font-black uppercase text-xs flex items-center justify-center gap-2 hover:scale-[1.02] transition-transform active:scale-95 text-center">Besøk Nettside</a>}
-            <a href={`mailto:${CONTACT_EMAIL}`} className="w-full py-5 bg-white/5 border border-white/10 text-white rounded-2xl font-black uppercase text-xs hover:bg-white/10 transition-all text-center">Send Forespørsel</a>
+            {company.website && (
+              <a href={company.website} target="_blank" rel="noopener noreferrer" className="w-full py-5 bg-white text-black rounded-2xl font-black uppercase text-xs flex items-center justify-center gap-2 hover:scale-[1.02] transition-transform active:scale-95 text-center">
+                Besøk Nettside
+              </a>
+            )}
+            <a href={`mailto:${CONTACT_EMAIL}?subject=Forespørsel angående ${company.name}`} className="w-full py-5 bg-white/5 border border-white/10 text-white rounded-2xl font-black uppercase text-xs hover:bg-white/10 transition-all text-center block">
+              Send Forespørsel
+            </a>
           </div>
         </div>
       </div>
