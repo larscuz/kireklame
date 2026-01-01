@@ -118,22 +118,32 @@ const App: React.FC = () => {
       : 'border-white/5 text-white/40 hover:text-white hover:bg-white/5'
     }`;
 
+  const scrollToTop = () => {
+    const mainElement = document.getElementById('main-content');
+    if (mainElement) mainElement.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const changeView = (v: View) => {
+    setView(v);
+    scrollToTop();
+  };
+
   return (
     <div className="flex h-screen bg-black text-white overflow-hidden selection:bg-blue-500/30">
-      <nav className="w-24 lg:w-80 border-r border-white/5 flex flex-col bg-[#050505] z-50">
+      <nav className="w-24 lg:w-80 border-r border-white/5 flex flex-col bg-[#050505] z-50 shrink-0">
         <div className="p-6">
           <div className="mb-12 flex items-center gap-4 px-2">
-            <div className="w-12 h-12 rounded-xl flex items-center justify-center shadow-[0_0_20px_rgba(21,129,197,0.3)] cursor-pointer overflow-hidden border border-white/10" onClick={() => setView('katalog')}>
-              <img src="logo.svg" alt="Ki.NO" className="w-full h-full object-cover" />
+            <div className="w-12 h-12 rounded-xl flex items-center justify-center shadow-[0_0_20px_rgba(21,129,197,0.3)] cursor-pointer overflow-hidden border border-white/10" onClick={() => changeView('katalog')}>
+              <img src="logo.svg" alt="Ki.NO" className="w-full h-full object-contain" />
             </div>
-            <div className="hidden lg:block cursor-pointer" onClick={() => setView('katalog')}>
+            <div className="hidden lg:block cursor-pointer" onClick={() => changeView('katalog')}>
               <h1 className="text-xl font-black tracking-tighter uppercase leading-none">KI REKLAME</h1>
               <p className="text-[10px] uppercase tracking-[0.2em] text-white/40 font-semibold mt-1">Oslo / Norge</p>
             </div>
           </div>
 
           <div className="space-y-4">
-            <button onClick={() => setView('katalog')} className={sidebarItemClass(view === 'katalog')}>
+            <button onClick={() => changeView('katalog')} className={sidebarItemClass(view === 'katalog')}>
               <span className="text-xl">📁</span>
               <div className="hidden lg:block text-left">
                 <p className="font-bold text-sm tracking-tight">Katalog</p>
@@ -141,7 +151,7 @@ const App: React.FC = () => {
               </div>
             </button>
 
-            <button onClick={() => setView('opplæring')} className={sidebarItemClass(view === 'opplæring')}>
+            <button onClick={() => changeView('opplæring')} className={sidebarItemClass(view === 'opplæring')}>
               <span className="text-xl">🎓</span>
               <div className="hidden lg:block text-left">
                 <p className="font-bold text-sm tracking-tight">KI-Opplæring</p>
@@ -149,7 +159,7 @@ const App: React.FC = () => {
               </div>
             </button>
 
-            <button onClick={() => setView('foredrag')} className={sidebarItemClass(view === 'foredrag')}>
+            <button onClick={() => changeView('foredrag')} className={sidebarItemClass(view === 'foredrag')}>
               <span className="text-xl">🎤</span>
               <div className="hidden lg:block text-left">
                 <p className="font-bold text-sm tracking-tight">Foredrag</p>
@@ -171,19 +181,21 @@ const App: React.FC = () => {
           <div className="p-4 rounded-2xl bg-white/[0.02] text-[10px] text-white/30 space-y-2">
              <p className="flex items-center gap-2 font-bold text-white/60">
               <span className="w-1.5 h-1.5 rounded-full bg-blue-500 animate-pulse shadow-[0_0_8px_#3b82f6]" />
-              Drevet av Cuz Media AS
+              Drevet av Cuz Media
             </p>
             <p className="opacity-50">© 2025 KI Reklame Norge</p>
           </div>
         </div>
       </nav>
 
-      <main className="flex-1 relative overflow-hidden flex flex-col h-full bg-[#030303]">
+      <main id="main-content" className="flex-1 relative overflow-y-auto overflow-x-hidden bg-[#030303] custom-scrollbar">
         <div className="absolute top-0 right-0 w-[60%] h-[60%] bg-blue-600/5 blur-[120px] rounded-full pointer-events-none" />
         
-        {view === 'katalog' && <KatalogMode companies={companies} setSelectedCompany={setSelectedCompany} />}
-        {view === 'opplæring' && <TrainingPage />}
-        {view === 'foredrag' && <KeynotePage />}
+        <div className="relative z-10">
+          {view === 'katalog' && <KatalogMode companies={companies} setSelectedCompany={setSelectedCompany} />}
+          {view === 'opplæring' && <TrainingPage />}
+          {view === 'foredrag' && <KeynotePage />}
+        </div>
       </main>
 
       {selectedCompany && <VideoModal company={selectedCompany} onClose={() => setSelectedCompany(null)} />}
@@ -193,10 +205,10 @@ const App: React.FC = () => {
 
 // --- Sidetyper ---
 const TrainingPage: React.FC = () => (
-  <div className="h-full overflow-y-auto custom-scrollbar p-10 lg:p-20">
+  <div className="p-10 lg:p-20">
     <div className="max-w-4xl mx-auto animate-in fade-in slide-in-from-bottom-4 duration-700">
       <span className="text-blue-500 font-black uppercase tracking-[0.3em] text-[10px] mb-4 block">Opplæring av Cuz Media</span>
-      <h2 className="text-5xl lg:text-7xl font-black italic tracking-tighter mb-10 leading-none">WORKSHOP <br/> <span className="text-white/20">KI-REKLAMER</span></h2>
+      <h2 className="text-5xl lg:text-7xl font-black italic tracking-tighter mb-10 leading-none">LAG DINE EGNE <br/> <span className="text-white/20">KI-REKLAMER</span></h2>
       
       <div className="aspect-video rounded-[2.5rem] bg-zinc-900 border border-white/10 overflow-hidden mb-12 shadow-2xl relative group">
         <video src="https://www.w3schools.com/html/mov_bbb.mp4" className="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-opacity" controls autoPlay muted loop />
@@ -223,7 +235,7 @@ const TrainingPage: React.FC = () => (
             ))}
           </ul>
         </div>
-        <div className="glass-card p-10 rounded-[2rem] border-blue-500/20 self-start sticky top-0">
+        <div className="glass-card p-10 rounded-[2rem] border-blue-500/20 self-start sticky top-10">
           <h4 className="text-xl font-black mb-4 uppercase italic">Klar for kurs?</h4>
           <p className="text-sm text-white/60 mb-8 leading-relaxed">Vi skreddersyr opplæring for markedsavdelinger and kreative team som ønsker å ta eierskap over KI-verktøyene.</p>
           <a href={`mailto:${CONTACT_EMAIL}?subject=Forespørsel om KI-Opplæring`} className="w-full block py-5 bg-white text-black rounded-2xl font-black uppercase text-xs hover:scale-[1.03] active:scale-95 transition-all mb-4 text-center">Kontakt Cuz Media</a>
@@ -235,10 +247,10 @@ const TrainingPage: React.FC = () => (
 );
 
 const KeynotePage: React.FC = () => (
-  <div className="h-full overflow-y-auto custom-scrollbar p-10 lg:p-20">
+  <div className="p-10 lg:p-20">
     <div className="max-w-4xl mx-auto animate-in fade-in slide-in-from-bottom-4 duration-700">
       <span className="text-blue-500 font-black uppercase tracking-[0.3em] text-[10px] mb-4 block">Foredrag av Cuz Media</span>
-      <h2 className="text-5xl lg:text-7xl font-black italic tracking-tighter mb-10 leading-none">FOREDRAG <br/> <span className="text-white/20">KREATIVITET LEVER</span></h2>
+      <h2 className="text-5xl lg:text-7xl font-black italic tracking-tighter mb-10 leading-none">FREMTIDENS <br/> <span className="text-white/20">MARKEFØRING</span></h2>
       
       <div className="aspect-video rounded-[2.5rem] bg-zinc-900 border border-white/10 overflow-hidden mb-12 shadow-2xl relative">
         <video src="https://www.w3schools.com/html/movie.mp4" className="w-full h-full object-cover opacity-80" controls autoPlay muted loop />
@@ -255,7 +267,7 @@ const KeynotePage: React.FC = () => (
              ))}
           </div>
         </div>
-        <div className="glass-card p-10 rounded-[2rem] border-white/10 self-start sticky top-0">
+        <div className="glass-card p-10 rounded-[2rem] border-white/10 self-start sticky top-10">
           <h4 className="text-xl font-black mb-4 uppercase italic">Book Cuz Media</h4>
           <p className="text-sm text-white/60 mb-8 leading-relaxed">Vi holder inspirerende foredrag for ledergrupper, konferanser og fagmiljøer som ønsker å forstå kraften i generativ KI.</p>
           <a href={`mailto:${CONTACT_EMAIL}?subject=Forespørsel om Foredrag`} className="w-full block py-5 bg-blue-600 text-white rounded-2xl font-black uppercase text-xs hover:bg-blue-500 hover:scale-[1.03] active:scale-95 transition-all mb-4 shadow-xl shadow-blue-500/20 text-center">Send forespørsel</a>
@@ -299,7 +311,6 @@ const VideoCard: React.FC<{ company: Company; onOpen: (c: Company) => void }> = 
 };
 
 const KatalogMode: React.FC<{ companies: Company[]; setSelectedCompany: (c: Company) => void }> = ({ companies, setSelectedCompany }) => {
-  // Sortering: bedrifter med videoUrl kommer først
   const sortPriority = (a: Company, b: Company) => {
     const hasA = !!(a.videoUrl && a.videoUrl.trim() !== '');
     const hasB = !!(b.videoUrl && b.videoUrl.trim() !== '');
@@ -312,33 +323,35 @@ const KatalogMode: React.FC<{ companies: Company[]; setSelectedCompany: (c: Comp
   const norge = companies.filter(c => c.segment === 'norge').sort(sortPriority);
 
   return (
-    <div className="h-full flex flex-col">
-      <header className="px-10 pt-16 pb-12 shrink-0 relative overflow-hidden">
+    <div className="w-full">
+      <header className="px-10 pt-16 pb-12 relative overflow-hidden">
         <h2 className="text-5xl lg:text-8xl font-black tracking-tighter italic mb-4 relative z-10">NORSK <span className="text-white/20">KI-KATALOG</span></h2>
         <p className="text-sm lg:text-lg text-white/30 max-w-2xl font-medium relative z-10">En kuratert oversikt over norske byråer og bedrifter som leder an innen AI-reklame. <span className="text-blue-500/50">Prioritert etter innhold.</span></p>
       </header>
-      <div className="flex-1 flex flex-col lg:flex-row overflow-hidden border-t border-white/5">
-        <section className="w-full lg:flex-1 h-full flex flex-col border-r border-white/5">
-          <div className="p-6 bg-black/50 backdrop-blur-xl border-b border-white/5 flex justify-between items-center z-10">
+      
+      <div className="flex flex-col lg:flex-row border-t border-white/5">
+        <section className="w-full lg:w-1/2 border-r border-white/5">
+          <div className="p-6 bg-black/50 backdrop-blur-xl border-b border-white/5 flex justify-between items-center sticky top-0 z-20">
             <h3 className="text-xs font-black uppercase tracking-[0.4em] text-blue-500 flex items-center gap-3">
               <span className="w-2 h-2 rounded-full bg-blue-500 shadow-[0_0_10px_#3b82f6]" />
               Oslo
             </h3>
             <span className="text-[10px] font-black text-white/20 uppercase tracking-widest">{oslo.length} Bedrifter</span>
           </div>
-          <div className="flex-1 overflow-y-auto custom-scrollbar p-8">
+          <div className="p-8">
             <div className="max-w-md mx-auto">{oslo.map(c => <VideoCard key={c.id} company={c} onOpen={setSelectedCompany} />)}</div>
           </div>
         </section>
-        <section className="w-full lg:flex-1 h-full flex flex-col bg-[#020202]">
-          <div className="p-6 bg-black/50 backdrop-blur-xl border-b border-white/5 flex justify-between items-center z-10">
+        
+        <section className="w-full lg:w-1/2 bg-[#020202]">
+          <div className="p-6 bg-black/50 backdrop-blur-xl border-b border-white/5 flex justify-between items-center sticky top-0 z-20">
             <h3 className="text-xs font-black uppercase tracking-[0.4em] text-white/40 flex items-center gap-3">
               <span className="w-2 h-2 rounded-full bg-white/40" />
               Norge
             </h3>
             <span className="text-[10px] font-black text-white/20 uppercase tracking-widest">{norge.length} Bedrifter</span>
           </div>
-          <div className="flex-1 overflow-y-auto custom-scrollbar p-8">
+          <div className="p-8">
             <div className="max-w-md mx-auto">{norge.map(c => <VideoCard key={c.id} company={c} onOpen={setSelectedCompany} />)}</div>
           </div>
         </section>
