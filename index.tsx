@@ -1,200 +1,178 @@
 
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { createRoot } from 'react-dom/client';
 
 // --- Typer ---
-type Segment = 'oslo' | 'norge';
-type View = 'katalog' | 'opplæring' | 'foredrag';
+type View = 'pro' | 'student' | 'education';
 
 interface Company {
   id: string;
   name: string;
-  segment: Segment;
   desc: string;
-  city?: string;
+  city: string;
   videoUrl?: string;
   website?: string;
   contact?: string;
+  type: 'pro' | 'student' | 'education';
 }
 
 const CONTACT_EMAIL = "x@larscuzner.com";
 
-// HJELPEFUNKSJON FOR Å GENERERE MOCK-DATA
-const generateMocks = () => {
-  const osloData: Partial<Company>[] = [
-    { name: 'Good Morning Naug', website: 'https://www.goodmorning.no', videoUrl: 'https://www.youtube.com/embed/4puf5Kvgh9Q', desc: 'Prisvinnende kreativt byrå som kombinerer strategi, design og teknologi.' },
-    { name: 'Well Told', website: 'https://www.welltold.no', desc: 'Spesialister på historiefortelling og digitalt innhold.' },
-    { name: 'INEVO', website: 'https://inevo.no', videoUrl: 'https://www.youtube.com/embed/videoseries?list=UUccl-H9_W_W6H_p3W3z0L3g', desc: 'Operativt markedsføringsbyrå med fokus på vekst og målbare resultater.' },
-    { name: 'Digital Driv', website: 'https://digitaldriv.no', desc: 'Hjelper bedrifter med digital transformasjon og synlighet.' },
-    { name: 'Tigon Marketing', website: 'https://tigonmarketing.no', desc: 'Datadrevet markedsføring og vekststrategier.' },
-    { name: 'DIGSTRA', website: 'https://digstra.no', desc: 'Spesialister på digital strategi og konverteringsoptimalisering.' },
-    { name: 'M51 Marketing', website: 'https://m51.no', desc: 'Fullservice digitalbyrå med fokus på ROI.' },
-    { name: 'MediaCatch', website: 'https://aheadgroup.no/mediacatch', desc: 'AI-drevet medieovervåking og analyse fra Ahead Group.' },
-    { name: 'MotherX AI', website: 'https://motherx.ai', desc: 'Plattform og byrå for AI-drevet innholdsproduksjon.' },
-    { name: 'Iteo', website: 'https://iteo.no', desc: 'B2B-markedsføring med fokus på innhold og PR.' },
-    { name: 'Effekt Media', website: 'https://effektmedia.no', desc: 'Eksperter på søkemotormarkedsføring og betalt annonsering.' },
-    { name: 'NXT Oslo', website: 'https://nxt.oslo.no', desc: 'Kreativt teknologibyrå i hjertet av Oslo.' },
-    { name: 'FaceFirst', website: 'https://www.facefirst.no', desc: 'Digital markedsføring med fokus på sosiale medier.' },
-    { name: 'Synlighet (Oslo)', website: 'https://synlighet.no', videoUrl: 'https://www.youtube.com/embed/F6mN_D0Z1oQ', desc: 'Et av Norges ledende performance marketing-miljøer.' },
-    { name: 'GAGNER', website: 'https://gagner.no', desc: 'Strategisk rådgivning og digital utførelse.' },
-  ];
-
-  const norgeData: Partial<Company>[] = [
-    { name: 'Synlighet (Bergen)', city: 'Bergen', website: 'https://synlighet.no', videoUrl: 'https://www.youtube.com/embed/F6mN_D0Z1oQ', desc: 'Hovedkontoret til Synlighet med fokus på performance and strategi.' },
-    { name: 'Attentio', city: 'Bergen', website: 'https://www.attentio.no', desc: 'Spesialister på digital synlighet og innhold i Bergen.' },
-    { name: 'TenneT', city: 'Bergen', website: 'https://tennet.no', desc: 'Leverer moderne digitale tjenester og markedsføringsløsninger.' },
-    { name: 'Cannonball PR', city: 'Bergen', website: 'https://www.cannonballpr.no', desc: 'PR og kommunikasjonsbyrå med hjerte for gode historier.' },
-    { name: 'Glø / Heiglo', city: 'Tromsø', website: 'https://heiglo.no', desc: 'Kreativt miljø i nord med fokus på visuell kommunikasjon.' },
-    { name: 'Essential Media', city: 'Tromsø', website: 'https://essentialmedia.no', desc: 'Digitalt innhold og markedsføring fra Nord-Norge.' },
-    { name: 'Involve', city: 'Trondheim/Tromsø', website: 'https://involve.no', desc: 'Nasjonalt byrå som leverer reklame og strategi over hele landet.' },
-    { name: 'Preferium', city: 'Fredrikstad', website: 'https://preferium.no', desc: 'Digitalbyrå i Fredrikstad med fokus på vekst.' },
+// --- Mock Data ---
+const generateCompanies = (): Company[] => {
+  const proData: Partial<Company>[] = [
+    { name: 'Oslo Kreativ AI', city: 'Oslo', website: 'https://oslokreativ.ai', desc: 'Fagmiljø og initiativtaker til Gullhaien. Et kraftsentrum for utforskning av KI i den kreative bransjen.' },
+    { name: 'DDB Nord', city: 'Oslo', website: 'https://ddbnord.no', desc: 'Byråprofil med tung KI-kompetanse, representert i juryen for Norges første KI-reklamepris.' },
+    { name: 'AVIA', city: 'Oslo', website: 'https://avia.no', desc: 'Produksjonsbyrå og fagmiljø for kreative vurderinger, med spesialisering på KI-drevet videoinnhold.' },
+    { name: 'Smør Studio', city: 'Oslo', website: 'https://smor.no', desc: 'Et kreativt teknologistudio med fokus på krysningen mellom design, teknologi og kunstig intelligens.' },
+    { name: 'AIAIAI', city: 'Oslo', website: 'https://aiaiai.as', videoUrl: 'https://www.youtube.com/embed/eXbsh7OQWWA', desc: 'Fra idé til ferdig produksjon på sekunder. AIAIAI leverer neste generasjons AI-innhold.' },
+    { name: 'Good Morning Naug', city: 'Oslo', website: 'https://www.goodmorning.no', videoUrl: 'https://www.youtube.com/embed/4puf5Kvgh9Q', desc: 'Prisvinnende kreativt byrå som kombinerer strategi, design og teknologi.' },
+    { name: 'Synlighet', city: 'Bergen', website: 'https://synlighet.no', videoUrl: 'https://www.youtube.com/embed/F6mN_D0Z1oQ', desc: 'Et av Norges ledende performance marketing-miljøer med tung AI-satsing.' },
+    { name: 'Well Told', city: 'Oslo', website: 'https://www.welltold.no', desc: 'Spesialister på historiefortelling og digitalt innhold.' },
+    { name: 'INEVO', city: 'Oslo', website: 'https://inevo.no', videoUrl: 'https://www.youtube.com/embed/videoseries?list=UUccl-H9_W_W6H_p3W3z0L3g', desc: 'Operativt markedsføringsbyrå med fokus på vekst og målbare resultater.' },
     { name: 'UXAR', city: 'Østlandet', website: 'https://uxar.ai', desc: 'Fremtidens reklame med AI, XR og Augmented Reality.' },
-    { name: 'AWISEE', city: 'Remote/Norge', website: 'https://awisee.com', desc: 'Internasjonalt fokus på linkbuilding og SEO for det norske markedet.' },
-    { name: 'Babylovegrowth', city: 'Bergen', website: 'https://babylovegrowth.com', desc: 'AI-drevet vekst og performance markedsføring.' },
     { name: 'Riktig Spor', city: 'Bodø', website: 'https://riktigspr.no', desc: 'Strategi, design og innhold i Nord-Norge.' },
-    { name: 'DMT', city: 'Nordland', website: 'https://dmt.no', desc: 'Digital Medie & Teknologi – din partner i Nordland.' },
     { name: 'Webfabrikk', city: 'Billingstad', website: 'https://webfabrikk.com', videoUrl: 'https://www.youtube.com/embed/kx8oZIPlWb4', desc: 'AI-drevet markedsføring som automatiserer og optimaliserer.' },
   ];
 
-  const allMocks: Company[] = [];
+  const studentData: Partial<Company>[] = [
+    { name: 'FutureFlow UB', city: 'Oslo', desc: 'Ungdomsbedrift som spesialiserer seg på AI-generert innhold for sosiale medier.' },
+    { name: 'PixelAI SB', city: 'Trondheim', desc: 'Studentbedrift fra NTNU som utforsker grensene for generativ video.' },
+    { name: 'NovaVision UB', city: 'Bergen', desc: 'Kreativt team som bruker KI for å hjelpe lokale bedrifter med rimelig annonsering.' },
+    { name: 'DeepBlue SB', city: 'Stavanger', desc: 'Fremtidens markedsførere med fokus på AI-optimalisering.' },
+    { name: 'Vekst UB', city: 'Tromsø', desc: 'Lokal ungdomskraft som leverer visuelle konsepter drevet av Midjourney og Runway.' },
+  ];
 
-  for (let i = 0; i < 50; i++) {
-    const data = osloData[i] || { name: `Selskap Oslo #${i + 1}`, website: '', desc: 'Innovativ bedrift med fokus på fremtidens løsninger.' };
-    allMocks.push({
-      id: `oslo-${i}`,
-      name: data.name!,
-      segment: 'oslo',
-      desc: data.desc || '',
-      city: 'Oslo',
-      videoUrl: data.videoUrl || '',
-      website: data.website || '',
-      contact: CONTACT_EMAIL
-    });
-  }
+  const educationData: Partial<Company>[] = [
+    { name: 'AIAIAI Bedrift', city: 'Oslo', website: 'https://aiaiai.as/bedrift/', desc: 'Skreddersydde bedriftskurs og workshops i generativ KI. Lær å produsere innhold effektivt med markedets råeste verktøy.' },
+    { name: 'Intelligenspartiet', city: 'Oslo', website: 'https://intelligenspartiet.no', desc: 'Foredrag og debatt om kunstig intelligens. Fokus på samfunnsendring, etikk og fremtidens kreative landskap.' },
+    { name: 'Umedia', city: 'Oslo', website: 'https://umedia.no', desc: 'Eksperter på kursing og opplæring i KI-verktøy for mediehus, markedsførere og innholdsprodusenter.' },
+    { name: 'Cuz Media', city: 'Oslo', website: 'https://cuzmedia.no', desc: 'Strategiske workshops og foredrag om implementering av KI i kreative prosesser og forretningsutvikling.' },
+    { name: 'AI Kurs Norge', city: 'Oslo', desc: 'Spesialtilpassede workshops for bedrifter som ønsker å implementere generativ KI i hverdagen.' },
+    { name: 'KI-Pedagogene', city: 'Trondheim', desc: 'Foredragsholdere med fokus på etikk, brukervennlighet og praktisk mestring av KI-verktøy.' },
+    { name: 'Fremtidens Foredrag', city: 'Bergen', desc: 'Inspirerende keynote-taler om hvordan AI endrer arbeidslivet og kreativitet.' },
+    { name: 'Prompt Studio', city: 'Stavanger', desc: 'Dypdykk i prompt engineering og visuell innholdsproduksjon for markedsavdelinger.' },
+    { name: 'Nordisk AI-Akademi', city: 'Oslo', desc: 'Sertifiseringskurs og omfattende opplæringsprogrammer for ledere og kreative.' },
+  ];
 
-  for (let i = 0; i < 50; i++) {
-    const data = norgeData[i] || { name: `Selskap Norge #${i + 1}`, city: 'Norge', website: '', desc: 'Lokalt forankret bedrift som tar i bruk moderne verktøy.' };
-    allMocks.push({
-      id: `norge-${i}`,
-      name: data.name!,
-      segment: 'norge',
-      desc: data.desc || '',
-      city: data.city || 'Norge',
-      videoUrl: data.videoUrl || '',
-      website: data.website || '',
-      contact: CONTACT_EMAIL
-    });
-  }
+  const all: Company[] = [];
+  proData.forEach((d, i) => all.push({ 
+    id: `pro-${i}`, name: d.name!, city: d.city!, desc: d.desc!, videoUrl: d.videoUrl, website: d.website, type: 'pro' 
+  }));
+  studentData.forEach((d, i) => all.push({ 
+    id: `stu-${i}`, name: d.name!, city: d.city!, desc: d.desc!, videoUrl: d.videoUrl, website: d.website, type: 'student' 
+  }));
+  educationData.forEach((d, i) => all.push({ 
+    id: `edu-${i}`, name: d.name!, city: d.city!, desc: d.desc!, videoUrl: d.videoUrl, website: d.website, type: 'education' 
+  }));
 
-  return allMocks;
+  return all;
 };
 
-const MOCK_COMPANIES = generateMocks();
+const ALL_COMPANIES = generateCompanies();
 
 // --- MediaDisplay ---
 const MediaDisplay: React.FC<{ url?: string; autoPlay?: boolean; muted?: boolean }> = ({ url, autoPlay = false, muted = true }) => {
   if (!url) return null;
   const isYouTube = url.includes('youtube.com') || url.includes('youtu.be');
-  const isVideoFile = url.match(/\.(mp4|webm|ogg)$/i);
-
   if (isYouTube) {
     const embedUrl = url.includes('embed') ? url : url.replace('watch?v=', 'embed/').split('&')[0];
-    return <iframe src={`${embedUrl}?autoplay=${autoPlay ? 1 : 0}&mute=${muted ? 1 : 0}&controls=0&loop=1`} className="w-full h-full border-none" allow="autoplay; encrypted-media" />;
+    return <iframe src={`${embedUrl}?autoplay=${autoPlay ? 1 : 0}&mute=${muted ? 1 : 0}&controls=0&loop=1`} className="w-full h-full border-none pointer-events-none" allow="autoplay; encrypted-media" />;
   }
-  if (isVideoFile) return <video src={url} className="w-full h-full object-cover" autoPlay={autoPlay} muted={muted} loop playsInline />;
-  return <div className="w-full h-full bg-zinc-900 flex items-center justify-center text-white/10 font-black italic">VIDEO_NULL</div>;
+  return <video src={url} className="w-full h-full object-cover" autoPlay={autoPlay} muted={muted} loop playsInline />;
 };
 
 // --- App ---
 const App: React.FC = () => {
-  const [view, setView] = useState<View>('katalog');
-  const [companies] = useState<Company[]>(MOCK_COMPANIES);
+  const [view, setView] = useState<View>('pro');
   const [selectedCompany, setSelectedCompany] = useState<Company | null>(null);
 
-  const sidebarItemClass = (active: boolean) => 
-    `w-full flex items-center gap-4 px-4 py-3.5 rounded-2xl border transition-all duration-300 ${
-      active 
-      ? 'border-blue-500/50 bg-blue-500/10 text-white shadow-xl shadow-blue-500/5' 
-      : 'border-white/5 text-white/40 hover:text-white hover:bg-white/5'
-    }`;
-
-  const scrollToTop = () => {
-    const mainElement = document.getElementById('main-content');
-    if (mainElement) mainElement.scrollTo({ top: 0, behavior: 'smooth' });
+  const sidebarItemClass = (active: boolean, activeColor: string = 'blue') => {
+    const colorClasses = {
+      blue: active ? 'border-blue-500/50 bg-blue-500/10 text-white shadow-xl shadow-blue-500/5' : 'border-white/5 text-white/40 hover:text-white hover:bg-white/5',
+      emerald: active ? 'border-emerald-500/50 bg-emerald-500/10 text-white shadow-xl shadow-emerald-500/5' : 'border-white/5 text-white/40 hover:text-white hover:bg-white/5',
+      purple: active ? 'border-purple-500/50 bg-purple-500/10 text-white shadow-xl shadow-purple-500/5' : 'border-white/5 text-white/40 hover:text-white hover:bg-white/5',
+    };
+    return `w-full flex items-center gap-4 px-4 py-4 rounded-2xl border transition-all duration-300 ${colorClasses[activeColor as keyof typeof colorClasses]}`;
   };
 
   const changeView = (v: View) => {
     setView(v);
-    scrollToTop();
+    const mainElement = document.getElementById('main-content');
+    if (mainElement) mainElement.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   return (
-    <div className="flex h-screen bg-black text-white overflow-hidden selection:bg-blue-500/30">
-      <nav className="w-24 lg:w-80 border-r border-white/5 flex flex-col bg-[#050505] z-50 shrink-0">
+    <div className="flex h-screen bg-[#1e1e1e] text-white overflow-hidden selection:bg-blue-500/30">
+      <nav className="w-24 lg:w-80 border-r border-white/5 flex flex-col bg-[#252525] z-50 shrink-0 shadow-2xl">
         <div className="p-6">
           <div className="mb-12 flex items-center gap-4 px-2">
-            <div className="w-12 h-12 rounded-xl flex items-center justify-center shadow-[0_0_20px_rgba(21,129,197,0.3)] cursor-pointer overflow-hidden border border-white/10" onClick={() => changeView('katalog')}>
+            <div className="w-12 h-12 rounded-xl flex items-center justify-center shadow-[0_0_20px_rgba(21,129,197,0.3)] cursor-pointer overflow-hidden border border-white/10" onClick={() => changeView('pro')}>
               <img src="logo.svg" alt="Ki.NO" className="w-full h-full object-contain" />
             </div>
-            <div className="hidden lg:block cursor-pointer" onClick={() => changeView('katalog')}>
-              <h1 className="text-xl font-black tracking-tighter uppercase leading-none">KI REKLAME</h1>
-              <p className="text-[10px] uppercase tracking-[0.2em] text-white/40 font-semibold mt-1">Oslo / Norge</p>
+            <div className="hidden lg:block cursor-pointer" onClick={() => changeView('pro')}>
+              <h1 className="text-xl font-black tracking-tighter uppercase leading-none italic">NORSK KI-REKLAME</h1>
+              <p className="text-[10px] uppercase tracking-[0.2em] text-white/40 font-semibold mt-1">Norge / AI Directory</p>
             </div>
           </div>
 
           <div className="space-y-4">
-            <button onClick={() => changeView('katalog')} className={sidebarItemClass(view === 'katalog')}>
-              <span className="text-xl">📁</span>
+            <button onClick={() => changeView('pro')} className={sidebarItemClass(view === 'pro', 'blue')}>
+              <span className="text-xl">💼</span>
               <div className="hidden lg:block text-left">
-                <p className="font-bold text-sm tracking-tight">Katalog</p>
-                <p className="text-[10px] opacity-40 font-medium">Alle bedrifter</p>
+                <p className="font-bold text-sm tracking-tight">Etablerte Byråer</p>
+                <p className="text-[10px] opacity-40 font-medium">Profesjonelle aktører</p>
               </div>
             </button>
 
-            <button onClick={() => changeView('opplæring')} className={sidebarItemClass(view === 'opplæring')}>
+            <button onClick={() => changeView('student')} className={sidebarItemClass(view === 'student', 'emerald')}>
               <span className="text-xl">🎓</span>
               <div className="hidden lg:block text-left">
-                <p className="font-bold text-sm tracking-tight">KI-Opplæring</p>
-                <p className="text-[10px] opacity-40 font-medium">Lær det selv</p>
+                <p className="font-bold text-sm tracking-tight">Ungdom & Student</p>
+                <p className="text-[10px] opacity-40 font-medium">Rimelige UB/SB-valg</p>
               </div>
             </button>
 
-            <button onClick={() => changeView('foredrag')} className={sidebarItemClass(view === 'foredrag')}>
-              <span className="text-xl">🎤</span>
+            <button onClick={() => changeView('education')} className={sidebarItemClass(view === 'education', 'purple')}>
+              <span className="text-xl">🎙️</span>
               <div className="hidden lg:block text-left">
-                <p className="font-bold text-sm tracking-tight">Foredrag</p>
-                <p className="text-[10px] opacity-40 font-medium">Inspirasjon & KI</p>
+                <p className="font-bold text-sm tracking-tight">Foredrag & Kurs</p>
+                <p className="text-[10px] opacity-40 font-medium">Workshops & Læring</p>
               </div>
             </button>
             
-            <a href={`mailto:${CONTACT_EMAIL}?subject=Send inn ny bedrift til katalogen`} className="w-full flex items-center gap-4 px-4 py-3.5 rounded-2xl border border-white/5 hover:border-white/20 text-white/40 hover:text-white transition-all group">
-              <span className="text-lg group-hover:scale-110 transition-transform">➕</span>
-              <div className="hidden lg:block text-left">
-                <p className="font-bold text-xs tracking-tight">Send inn ny bedrift</p>
-              </div>
-            </a>
+            <div className="pt-4 border-t border-white/5">
+              <a href={`mailto:${CONTACT_EMAIL}?subject=Send inn bedrift`} className="w-full flex items-center gap-4 px-4 py-4 rounded-2xl border border-white/5 hover:border-white/20 text-white/40 hover:text-white transition-all group">
+                <span className="text-lg group-hover:scale-110 transition-transform">➕</span>
+                <div className="hidden lg:block text-left">
+                  <p className="font-bold text-xs tracking-tight">Send inn din bedrift</p>
+                </div>
+              </a>
+            </div>
           </div>
         </div>
         
         <div className="flex-1" />
         <div className="p-6 border-t border-white/5">
-          <div className="p-4 rounded-2xl bg-white/[0.02] text-[10px] text-white/30 space-y-2">
+          <div className="p-4 rounded-2xl bg-white/[0.03] text-[10px] text-white/30 space-y-2">
              <p className="flex items-center gap-2 font-bold text-white/60">
-              <span className="w-1.5 h-1.5 rounded-full bg-blue-500 animate-pulse shadow-[0_0_8px_#3b82f6]" />
-              Drevet av Cuz Media
+              <span className="w-1.5 h-1.5 rounded-full bg-blue-500 animate-pulse" />
+              Drevet av Cuz Media AS
             </p>
-            <p className="opacity-50">© 2025 KI Reklame Norge</p>
+            <p className="opacity-50">© 2025 Norsk KI-Reklame</p>
           </div>
         </div>
       </nav>
 
-      <main id="main-content" className="flex-1 relative overflow-y-auto overflow-x-hidden bg-[#030303] custom-scrollbar">
+      <main id="main-content" className="flex-1 relative overflow-y-auto overflow-x-hidden bg-[#1e1e1e] custom-scrollbar">
         <div className="absolute top-0 right-0 w-[60%] h-[60%] bg-blue-600/5 blur-[120px] rounded-full pointer-events-none" />
         
         <div className="relative z-10">
-          {view === 'katalog' && <KatalogMode companies={companies} setSelectedCompany={setSelectedCompany} />}
-          {view === 'opplæring' && <TrainingPage />}
-          {view === 'foredrag' && <KeynotePage />}
+          <KatalogMode 
+            type={view} 
+            companies={ALL_COMPANIES} 
+            setSelectedCompany={setSelectedCompany} 
+          />
         </div>
       </main>
 
@@ -203,195 +181,221 @@ const App: React.FC = () => {
   );
 };
 
-// --- Sidetyper ---
-const TrainingPage: React.FC = () => (
-  <div className="p-10 lg:p-20">
-    <div className="max-w-4xl mx-auto animate-in fade-in slide-in-from-bottom-4 duration-700">
-      <span className="text-blue-500 font-black uppercase tracking-[0.3em] text-[10px] mb-4 block">Opplæring av Cuz Media</span>
-      <h2 className="text-5xl lg:text-7xl font-black italic tracking-tighter mb-10 leading-none">LAG DINE EGNE <br/> <span className="text-white/20">KI-REKLAMER</span></h2>
-      
-      <div className="aspect-video rounded-[2.5rem] bg-zinc-900 border border-white/10 overflow-hidden mb-12 shadow-2xl relative group">
-        <video src="https://www.w3schools.com/html/mov_bbb.mp4" className="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-opacity" controls autoPlay muted loop />
-        <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent pointer-events-none" />
-      </div>
-
-      <div className="grid lg:grid-cols-2 gap-12">
-        <div className="space-y-8">
-          <h3 className="text-2xl font-bold italic uppercase tracking-tight">Hva du vil lære</h3>
-          <ul className="space-y-6">
-            {[
-              { t: 'Prompt Engineering', d: 'Lær å kommunisere med KI-modeller for å få nøyaktig det visuelle resultatet du ønsker.' },
-              { t: 'Video-generering', d: 'Bruk verktøy som Runway, Luma og Kling for å lage film fra tekst eller bilder.' },
-              { t: 'AI-Stemmer & Audio', d: 'Integrer profesjonelle voiceovers og musikk generert i sanntid.' },
-              { t: 'Arbeidsflyt', d: 'Hvordan kutte produksjonstiden fra uker til timer.' }
-            ].map(item => (
-              <li key={item.t} className="flex gap-4 group">
-                <div className="w-1 h-12 bg-blue-600 group-hover:h-16 transition-all duration-500" />
-                <div>
-                  <h4 className="font-black text-sm uppercase mb-1 tracking-tight">{item.t}</h4>
-                  <p className="text-sm text-white/40 leading-relaxed">{item.d}</p>
-                </div>
-              </li>
-            ))}
-          </ul>
-        </div>
-        <div className="glass-card p-10 rounded-[2rem] border-blue-500/20 self-start sticky top-10">
-          <h4 className="text-xl font-black mb-4 uppercase italic">Klar for kurs?</h4>
-          <p className="text-sm text-white/60 mb-8 leading-relaxed">Vi skreddersyr opplæring for markedsavdelinger and kreative team som ønsker å ta eierskap over KI-verktøyene.</p>
-          <a href={`mailto:${CONTACT_EMAIL}?subject=Forespørsel om KI-Opplæring`} className="w-full block py-5 bg-white text-black rounded-2xl font-black uppercase text-xs hover:scale-[1.03] active:scale-95 transition-all mb-4 text-center">Kontakt Cuz Media</a>
-          <p className="text-center text-[10px] text-white/20 font-bold uppercase tracking-widest">Kurs holdes i Oslo eller digitalt</p>
-        </div>
-      </div>
-    </div>
-  </div>
-);
-
-const KeynotePage: React.FC = () => (
-  <div className="p-10 lg:p-20">
-    <div className="max-w-4xl mx-auto animate-in fade-in slide-in-from-bottom-4 duration-700">
-      <span className="text-blue-500 font-black uppercase tracking-[0.3em] text-[10px] mb-4 block">Foredrag av Cuz Media</span>
-      <h2 className="text-5xl lg:text-7xl font-black italic tracking-tighter mb-10 leading-none">FREMTIDENS <br/> <span className="text-white/20">MARKEFØRING</span></h2>
-      
-      <div className="aspect-video rounded-[2.5rem] bg-zinc-900 border border-white/10 overflow-hidden mb-12 shadow-2xl relative">
-        <video src="https://www.w3schools.com/html/movie.mp4" className="w-full h-full object-cover opacity-80" controls autoPlay muted loop />
-      </div>
-
-      <div className="grid lg:grid-cols-2 gap-12">
-        <div className="space-y-8">
-          <h3 className="text-2xl font-bold italic uppercase tracking-tight">Temaer i foredraget</h3>
-          <div className="space-y-4">
-             {['KI-revolusjonen i reklamebransjen', 'Slik sparer store merkevarer millioner', 'Etikk og autentisitet i en syntetisk verden', 'Fremtidens kreative roller'].map(t => (
-               <div key={t} className="p-6 rounded-2xl bg-white/[0.03] border border-white/5 hover:border-white/20 hover:bg-white/[0.05] transition-all cursor-default">
-                 <p className="font-bold text-sm tracking-tight">{t}</p>
-               </div>
-             ))}
-          </div>
-        </div>
-        <div className="glass-card p-10 rounded-[2rem] border-white/10 self-start sticky top-10">
-          <h4 className="text-xl font-black mb-4 uppercase italic">Book Cuz Media</h4>
-          <p className="text-sm text-white/60 mb-8 leading-relaxed">Vi holder inspirerende foredrag for ledergrupper, konferanser og fagmiljøer som ønsker å forstå kraften i generativ KI.</p>
-          <a href={`mailto:${CONTACT_EMAIL}?subject=Forespørsel om Foredrag`} className="w-full block py-5 bg-blue-600 text-white rounded-2xl font-black uppercase text-xs hover:bg-blue-500 hover:scale-[1.03] active:scale-95 transition-all mb-4 shadow-xl shadow-blue-500/20 text-center">Send forespørsel</a>
-          <p className="text-center text-[10px] text-white/20 font-bold uppercase tracking-widest">Tilgjengelig for oppdrag i hele Norge</p>
-        </div>
-      </div>
-    </div>
-  </div>
-);
-
 // --- KatalogModuler ---
 const VideoCard: React.FC<{ company: Company; onOpen: (c: Company) => void }> = ({ company, onOpen }) => {
   const hasVideo = !!(company.videoUrl && company.videoUrl.trim() !== '');
+  
+  const getAccentColor = () => {
+    if (company.type === 'student') return 'emerald';
+    if (company.type === 'education') return 'purple';
+    return 'blue';
+  };
+
+  const accent = getAccentColor();
+  const accentBorder = accent === 'emerald' ? 'hover:border-emerald-500/30' : accent === 'purple' ? 'hover:border-purple-500/30' : 'hover:border-blue-500/30';
+  const accentText = accent === 'emerald' ? 'group-hover:text-emerald-400' : accent === 'purple' ? 'group-hover:text-purple-400' : 'group-hover:text-blue-400';
+
   return (
     <article 
-      className={`group glass-card rounded-[2rem] p-5 hover:bg-white/[0.06] transition-all border-white/5 hover:border-blue-500/30 cursor-pointer mb-6 animate-in slide-in-from-bottom-4 relative overflow-hidden ${!hasVideo ? 'opacity-70 grayscale-[0.5] hover:opacity-100 hover:grayscale-0' : ''}`} 
+      className={`group glass-card rounded-[2.5rem] p-6 bg-[#2d2d2d]/40 hover:bg-[#2d2d2d]/80 transition-all border-white/5 ${accentBorder} cursor-pointer mb-8 animate-in slide-in-from-bottom-4 relative overflow-hidden ${!hasVideo ? 'opacity-80' : ''}`} 
       onClick={() => onOpen(company)}
     >
-      <div className="aspect-video rounded-2xl bg-zinc-900/50 border border-white/5 mb-5 overflow-hidden relative group-hover:shadow-[0_0_30px_rgba(59,130,246,0.1)] transition-all">
+      <div className="aspect-video rounded-3xl bg-[#181818] border border-white/5 mb-6 overflow-hidden relative group-hover:shadow-[0_0_40px_rgba(100,100,100,0.1)] transition-all">
         {hasVideo ? (
           <MediaDisplay url={company.videoUrl} autoPlay={false} />
         ) : (
-          <div className="absolute inset-0 flex items-center justify-center text-white/5 font-black text-2xl uppercase tracking-tighter text-center px-4">
+          <div className="absolute inset-0 flex items-center justify-center text-white/[0.03] font-black text-3xl uppercase tracking-tighter text-center px-4">
             {company.name}
           </div>
         )}
-        {company.website && (
-          <button onClick={(e) => { e.stopPropagation(); window.open(company.website, '_blank'); }} className="absolute bottom-4 right-4 bg-white/10 hover:bg-white/20 backdrop-blur-md border border-white/10 rounded-full p-2.5 opacity-0 group-hover:opacity-100 transition-all hover:scale-110 active:scale-95">
-            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
-          </button>
-        )}
+        <div className="absolute top-4 left-4 flex gap-2">
+           <span className="bg-black/60 backdrop-blur-md text-[8px] font-black px-2.5 py-1 rounded-full uppercase tracking-widest border border-white/10">{company.city}</span>
+        </div>
       </div>
-      <div className="flex justify-between items-start gap-2 mb-1">
-        <h4 className="text-lg font-bold uppercase group-hover:text-blue-400 truncate tracking-tight">{company.name}</h4>
-        {hasVideo && <span className="bg-blue-500/20 text-blue-400 text-[8px] font-black px-2 py-0.5 rounded-full uppercase">Video</span>}
+      <div className="flex justify-between items-start gap-2 mb-2">
+        <h4 className={`text-xl font-black uppercase ${accentText} truncate tracking-tighter italic transition-colors`}>{company.name}</h4>
+        {company.type === 'student' && <span className="bg-emerald-500/10 text-emerald-400 text-[8px] font-black px-2 py-1 rounded-md uppercase border border-emerald-500/20">Studentbedrift</span>}
+        {company.type === 'education' && <span className="bg-purple-500/10 text-purple-400 text-[8px] font-black px-2 py-1 rounded-md uppercase border border-purple-500/20">Utdanning</span>}
       </div>
-      <p className="text-[10px] text-white/40 uppercase tracking-widest font-black mb-3">{company.city}</p>
-      <p className="text-xs text-white/50 line-clamp-2 leading-relaxed h-8">{company.desc}</p>
+      <p className="text-xs text-white/40 line-clamp-2 leading-relaxed h-10">{company.desc}</p>
     </article>
   );
 };
 
-const KatalogMode: React.FC<{ companies: Company[]; setSelectedCompany: (c: Company) => void }> = ({ companies, setSelectedCompany }) => {
-  const sortPriority = (a: Company, b: Company) => {
-    const hasA = !!(a.videoUrl && a.videoUrl.trim() !== '');
-    const hasB = !!(b.videoUrl && b.videoUrl.trim() !== '');
-    if (hasA && !hasB) return -1;
-    if (!hasA && hasB) return 1;
-    return a.name.localeCompare(b.name);
+const KatalogMode: React.FC<{ type: View, companies: Company[]; setSelectedCompany: (c: Company) => void }> = ({ type, companies, setSelectedCompany }) => {
+  const [selectedCity, setSelectedCity] = useState<string>('Alle');
+
+  const filteredBase = companies.filter(c => c.type === type);
+  const cities = useMemo(() => {
+    const set = new Set(filteredBase.map(c => c.city));
+    return ['Alle', ...Array.from(set).sort()];
+  }, [filteredBase]);
+
+  const filtered = useMemo(() => {
+    const list = selectedCity === 'Alle' ? filteredBase : filteredBase.filter(c => c.city === selectedCity);
+    return list.sort((a, b) => {
+      const hasA = !!a.videoUrl;
+      const hasB = !!b.videoUrl;
+      if (hasA && !hasB) return -1;
+      if (!hasA && hasB) return 1;
+      return a.name.localeCompare(b.name);
+    });
+  }, [filteredBase, selectedCity]);
+
+  const leftCol = filtered.filter((_, i) => i % 2 === 0);
+  const rightCol = filtered.filter((_, i) => i % 2 !== 0);
+
+  const getHeaderInfo = () => {
+    switch(type) {
+      case 'student':
+        return {
+          title: "KI-STUDENT",
+          subtitle: "Ungdomsbedrifter (UB) og Studentbedrifter (SB) opererer under opplæringsloven. Dette betyr at de kan tilby kreative AI-tjenester til en brøkdel av prisen.",
+          accent: "emerald",
+          badge: "UB/SB Fordelen",
+          badgeDesc: "Perfekt for gründere og små bedrifter som trenger toppmoderne KI-innhold på et stramt budsjett."
+        };
+      case 'education':
+        return {
+          title: "KI-LÆRING",
+          subtitle: "Lær å mestre fremtidens verktøy. Her finner du kursholdere, foredragsholdere og pedagoger som hjelper din bedrift med å forstå og bruke AI effektivt.",
+          accent: "purple",
+          badge: "Ekspertise & Innsikt",
+          badgeDesc: "Fra inspirerende keynotes til praktiske workshops. Finn de som kan lære bort kunsten å samarbeide med KI."
+        };
+      default:
+        return {
+          title: "KI-REKLAME",
+          subtitle: "NORSKE kreative bedrifter som bruker AI",
+          accent: "blue",
+          badge: null,
+          badgeDesc: null
+        };
+    }
   };
 
-  const oslo = companies.filter(c => c.segment === 'oslo').sort(sortPriority);
-  const norge = companies.filter(c => c.segment === 'norge').sort(sortPriority);
+  const header = getHeaderInfo();
+  const accentBorder = header.accent === 'emerald' ? 'border-emerald-500' : header.accent === 'purple' ? 'border-purple-500' : 'border-blue-500';
 
   return (
     <div className="w-full">
-      <header className="px-10 pt-16 pb-12 relative overflow-hidden">
-        <h2 className="text-5xl lg:text-8xl font-black tracking-tighter italic mb-4 relative z-10">NORSK <span className="text-white/20">KI-KATALOG</span></h2>
-        <p className="text-sm lg:text-lg text-white/30 max-w-2xl font-medium relative z-10">En kuratert oversikt over norske byråer og bedrifter som leder an innen AI-reklame. <span className="text-blue-500/50">Prioritert etter innhold.</span></p>
+      <header className="px-10 lg:px-16 pt-20 pb-12 relative overflow-hidden bg-[#2d2d2d]/20">
+        <h2 className="text-5xl lg:text-8xl font-black tracking-tighter italic mb-6 relative z-10 leading-none">NORSK <br/><span className="text-white/10">{header.title}</span></h2>
+        
+        <div className="grid lg:grid-cols-2 gap-10 mb-10 relative z-10">
+          <p className={`text-sm lg:text-xl text-white/30 font-medium leading-relaxed italic border-l-2 ${accentBorder} pl-6 uppercase tracking-tight`}>
+            {header.subtitle}
+          </p>
+          {header.badge && (
+            <div className={`p-6 rounded-3xl bg-${header.accent}-500/5 border border-${header.accent}-500/10`}>
+              <p className={`text-xs text-${header.accent}-200/40 uppercase font-black tracking-widest mb-2`}>{header.badge}</p>
+              <p className={`text-sm text-${header.accent}-100/60 leading-relaxed`}>{header.badgeDesc}</p>
+            </div>
+          )}
+        </div>
+        
+        <div className="relative z-10 max-w-xs mt-4">
+          <label htmlFor="city-select" className="text-[10px] uppercase font-black tracking-[0.2em] text-white/20 mb-2 block">Filtrer etter by</label>
+          <div className="relative">
+            <select
+              id="city-select"
+              value={selectedCity}
+              onChange={(e) => setSelectedCity(e.target.value)}
+              className="w-full bg-white/5 border border-white/10 text-white text-xs font-black uppercase tracking-widest px-6 py-4 rounded-2xl appearance-none cursor-pointer hover:bg-white/10 transition-all focus:outline-none focus:border-blue-500/50"
+            >
+              {cities.map(city => (
+                <option key={city} value={city} className="bg-[#333] text-white">{city}</option>
+              ))}
+            </select>
+            <div className="absolute right-6 top-1/2 -translate-y-1/2 pointer-events-none text-white/30">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="m6 9 6 6 6-6"/></svg>
+            </div>
+          </div>
+        </div>
       </header>
       
-      <div className="flex flex-col lg:flex-row border-t border-white/5">
-        <section className="w-full lg:w-1/2 border-r border-white/5">
-          <div className="p-6 bg-black/50 backdrop-blur-xl border-b border-white/5 flex justify-between items-center sticky top-0 z-20">
-            <h3 className="text-xs font-black uppercase tracking-[0.4em] text-blue-500 flex items-center gap-3">
-              <span className="w-2 h-2 rounded-full bg-blue-500 shadow-[0_0_10px_#3b82f6]" />
-              Oslo
-            </h3>
-            <span className="text-[10px] font-black text-white/20 uppercase tracking-widest">{oslo.length} Bedrifter</span>
-          </div>
-          <div className="p-8">
-            <div className="max-w-md mx-auto">{oslo.map(c => <VideoCard key={c.id} company={c} onOpen={setSelectedCompany} />)}</div>
-          </div>
-        </section>
-        
-        <section className="w-full lg:w-1/2 bg-[#020202]">
-          <div className="p-6 bg-black/50 backdrop-blur-xl border-b border-white/5 flex justify-between items-center sticky top-0 z-20">
-            <h3 className="text-xs font-black uppercase tracking-[0.4em] text-white/40 flex items-center gap-3">
-              <span className="w-2 h-2 rounded-full bg-white/40" />
-              Norge
-            </h3>
-            <span className="text-[10px] font-black text-white/20 uppercase tracking-widest">{norge.length} Bedrifter</span>
-          </div>
-          <div className="p-8">
-            <div className="max-w-md mx-auto">{norge.map(c => <VideoCard key={c.id} company={c} onOpen={setSelectedCompany} />)}</div>
-          </div>
-        </section>
+      <div className="grid grid-cols-1 lg:grid-cols-2 border-t border-white/5 bg-[#1e1e1e] min-h-screen">
+        <div className="p-8 lg:p-12 lg:border-r border-white/5">
+           <div className="max-w-xl mx-auto">{leftCol.map(c => <VideoCard key={c.id} company={c} onOpen={setSelectedCompany} />)}</div>
+        </div>
+        <div className="p-8 lg:p-12">
+           <div className="max-w-xl mx-auto">{rightCol.map(c => <VideoCard key={c.id} company={c} onOpen={setSelectedCompany} />)}</div>
+        </div>
       </div>
     </div>
   );
 };
 
+// --- Modal ---
 const VideoModal: React.FC<{ company: Company; onClose: () => void }> = ({ company, onClose }) => {
+  const getBadgeColors = () => {
+    if (company.type === 'student') return 'bg-emerald-500 text-black';
+    if (company.type === 'education') return 'bg-purple-600 text-white';
+    return 'bg-blue-600 text-white';
+  };
+
+  const getLabel = () => {
+    if (company.type === 'student') return 'UB / SB';
+    if (company.type === 'education') return 'UTDANNING';
+    return 'PRO BYRÅ';
+  };
+
   return (
     <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 animate-in fade-in duration-300" onClick={onClose}>
-      <div className="absolute inset-0 bg-black/98 backdrop-blur-3xl" />
-      <div className="relative w-full max-w-6xl bg-[#080808] border border-white/10 rounded-[3rem] overflow-hidden flex flex-col lg:flex-row shadow-[0_0_100px_rgba(0,0,0,0.8)]" onClick={e => e.stopPropagation()}>
-        <div className="flex-1 bg-black flex items-center justify-center min-h-[400px]">
-          <MediaDisplay url={company.videoUrl} autoPlay={true} muted={false} />
+      <div className="absolute inset-0 bg-[#1e1e1ec0] backdrop-blur-3xl" />
+      <div className="relative w-full max-w-6xl bg-[#252525] border border-white/10 rounded-[4rem] overflow-hidden flex flex-col lg:flex-row shadow-[0_0_120px_rgba(0,0,0,0.5)]" onClick={e => e.stopPropagation()}>
+        <div className="flex-1 bg-black flex items-center justify-center min-h-[450px]">
+          {company.videoUrl ? (
+             <MediaDisplay url={company.videoUrl} autoPlay={true} muted={false} />
+          ) : (
+            <div className="text-white/[0.03] font-black text-6xl italic uppercase">{company.name}</div>
+          )}
         </div>
-        <div className="w-full lg:w-[450px] p-12 border-l border-white/5 bg-zinc-950 flex flex-col relative">
-          <button onClick={onClose} className="absolute top-8 right-8 text-white/20 hover:text-white transition-colors w-10 h-10 flex items-center justify-center rounded-full hover:bg-white/5">✕</button>
-          <div className="mb-10 pt-4">
-            <h2 className="text-4xl font-black uppercase italic mb-2 tracking-tighter leading-none">{company.name}</h2>
-            <p className="text-xs text-blue-500 font-bold uppercase tracking-[0.2em]">{company.city}</p>
+        <div className="w-full lg:w-[500px] p-16 border-l border-white/5 bg-[#252525] flex flex-col relative">
+          <button onClick={onClose} className="absolute top-10 right-10 text-white/20 hover:text-white transition-colors w-12 h-12 flex items-center justify-center rounded-full hover:bg-white/5 text-xl">✕</button>
+          
+          <div className="mb-12 pt-4">
+            <span className={`inline-block px-3 py-1 rounded-md text-[9px] font-black uppercase mb-4 tracking-widest ${getBadgeColors()}`}>
+              {getLabel()}
+            </span>
+            <h2 className="text-5xl font-black uppercase italic mb-2 tracking-tighter leading-none">{company.name}</h2>
+            <p className="text-xs text-white/40 font-bold uppercase tracking-[0.3em]">{company.city}</p>
           </div>
-          <div className="space-y-8 flex-1">
+
+          <div className="space-y-10 flex-1">
             <div>
-              <h5 className="text-[10px] uppercase font-black text-white/20 mb-3 tracking-widest">Beskrivelse</h5>
-              <p className="text-sm text-white/70 leading-relaxed font-medium">{company.desc}</p>
+              <h5 className="text-[10px] uppercase font-black text-white/20 mb-4 tracking-[0.2em]">Om {company.type === 'education' ? 'tjenesten' : 'selskapet'}</h5>
+              <p className="text-lg text-white/70 leading-relaxed font-medium italic">{company.desc}</p>
             </div>
+            
+            {company.type === 'student' && (
+              <div className="p-6 rounded-3xl bg-emerald-500/5 border border-emerald-500/10">
+                <p className="text-[9px] font-black text-emerald-400 uppercase tracking-widest mb-1">Prismodell</p>
+                <p className="text-xs text-emerald-200/50">Studentbedrifter kan ofte levere tjenester til en vesentlig lavere pris som del av sitt utdanningsløp.</p>
+              </div>
+            )}
+
+            {company.type === 'education' && (
+              <div className="p-6 rounded-3xl bg-purple-500/5 border border-purple-500/10">
+                <p className="text-[9px] font-black text-purple-400 uppercase tracking-widest mb-1">Faglig Utvikling</p>
+                <p className="text-xs text-purple-200/50">Disse aktørene tilbyr alt fra korte lunsj-foredrag til dypgående workshops over flere dager.</p>
+              </div>
+            )}
+
             <div>
-              <h5 className="text-[10px] uppercase font-black text-white/20 mb-1 tracking-widest">Kontaktpunkt</h5>
-              <p className="text-sm font-bold text-white opacity-80">{CONTACT_EMAIL}</p>
+              <h5 className="text-[10px] uppercase font-black text-white/20 mb-1 tracking-[0.2em]">Kontakt</h5>
+              <p className="text-md font-bold text-white opacity-80">{CONTACT_EMAIL}</p>
             </div>
           </div>
-          <div className="mt-12 space-y-3">
+
+          <div className="mt-16 space-y-4">
             {company.website && (
-              <a href={company.website} target="_blank" rel="noopener noreferrer" className="w-full py-5 bg-white text-black rounded-2xl font-black uppercase text-xs flex items-center justify-center gap-2 hover:scale-[1.02] transition-transform active:scale-95 text-center">
-                Besøk Nettside
+              <a href={company.website} target="_blank" rel="noopener noreferrer" className="w-full py-6 bg-white text-black rounded-3xl font-black uppercase text-xs flex items-center justify-center gap-2 hover:scale-[1.02] transition-transform active:scale-95 shadow-xl">
+                {company.type === 'education' ? 'Se Kursinfo' : 'Besøk Portefølje'}
               </a>
             )}
-            <a href={`mailto:${CONTACT_EMAIL}?subject=Forespørsel angående ${company.name}`} className="w-full py-5 bg-white/5 border border-white/10 text-white rounded-2xl font-black uppercase text-xs hover:bg-white/10 transition-all text-center block">
-              Send Forespørsel
+            <a href={`mailto:${CONTACT_EMAIL}?subject=Forespørsel til ${company.name}`} className="w-full py-6 bg-white/5 border border-white/10 text-white rounded-3xl font-black uppercase text-xs hover:bg-white/10 transition-all text-center block">
+              Kontakt {company.type === 'education' ? 'Aktør' : 'Bedrift'}
             </a>
           </div>
         </div>
