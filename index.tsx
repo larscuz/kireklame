@@ -196,7 +196,7 @@ const TrainingPage: React.FC = () => (
   <div className="h-full overflow-y-auto custom-scrollbar p-10 lg:p-20">
     <div className="max-w-4xl mx-auto animate-in fade-in slide-in-from-bottom-4 duration-700">
       <span className="text-blue-500 font-black uppercase tracking-[0.3em] text-[10px] mb-4 block">Opplæring av Cuz Media</span>
-      <h2 className="text-5xl lg:text-7xl font-black italic tracking-tighter mb-10 leading-none">LAG DINE EGNE <br/> <span className="text-white/20">KI-REKLAMER</span></h2>
+      <h2 className="text-5xl lg:text-7xl font-black italic tracking-tighter mb-10 leading-none">WORKSHOP <br/> <span className="text-white/20">KI-REKLAMER</span></h2>
       
       <div className="aspect-video rounded-[2.5rem] bg-zinc-900 border border-white/10 overflow-hidden mb-12 shadow-2xl relative group">
         <video src="https://www.w3schools.com/html/mov_bbb.mp4" className="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-opacity" controls autoPlay muted loop />
@@ -238,7 +238,7 @@ const KeynotePage: React.FC = () => (
   <div className="h-full overflow-y-auto custom-scrollbar p-10 lg:p-20">
     <div className="max-w-4xl mx-auto animate-in fade-in slide-in-from-bottom-4 duration-700">
       <span className="text-blue-500 font-black uppercase tracking-[0.3em] text-[10px] mb-4 block">Foredrag av Cuz Media</span>
-      <h2 className="text-5xl lg:text-7xl font-black italic tracking-tighter mb-10 leading-none">FREMTIDENS <br/> <span className="text-white/20">MARKEFØRING</span></h2>
+      <h2 className="text-5xl lg:text-7xl font-black italic tracking-tighter mb-10 leading-none">FOREDRAG <br/> <span className="text-white/20">KREATIVITET LEVER</span></h2>
       
       <div className="aspect-video rounded-[2.5rem] bg-zinc-900 border border-white/10 overflow-hidden mb-12 shadow-2xl relative">
         <video src="https://www.w3schools.com/html/movie.mp4" className="w-full h-full object-cover opacity-80" controls autoPlay muted loop />
