@@ -171,7 +171,7 @@ const App: React.FC = () => {
           <div className="p-4 rounded-2xl bg-white/[0.02] text-[10px] text-white/30 space-y-2">
              <p className="flex items-center gap-2 font-bold text-white/60">
               <span className="w-1.5 h-1.5 rounded-full bg-blue-500 animate-pulse shadow-[0_0_8px_#3b82f6]" />
-              Drevet av Cuz Media
+              Drevet av Cuz Media AS
             </p>
             <p className="opacity-50">© 2025 KI Reklame Norge</p>
           </div>
